@@ -1021,7 +1021,12 @@
         function setMainDisplay(displayType) {
             gameState.currentDisplay = displayType;
             saveToStorage();
-            syncDisplays(); // Update local display too
+            
+            // Only sync displays if we're NOT on the control panel
+            // Control panel should stay on control panel
+            if (!document.getElementById('controlPanel').classList.contains('active')) {
+                syncDisplays();
+            }
             
             document.querySelectorAll('.display-btn').forEach(btn => btn.classList.remove('active-display'));
             event.target.classList.add('active-display');
