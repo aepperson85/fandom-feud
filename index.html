@@ -2244,6 +2244,20 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/Z" alt="Survey QR Code" style="width: 300px; 
             </div>
         </div>
 
+        <!-- Round Pot Control -->
+        <div class="score-control-group" style="margin-bottom: 20px; background: #1e3c72; border: 3px solid #ffffff;">
+            <h3 style="color: #ffffff;">Round Pot: <span id="roundPotDisplay" style="color: #ffffff;">0</span> Points</h3>
+            <p style="color: #ffffff; opacity: 0.8; margin: 10px 0;">Revealed answers accumulate here. Award to winning team at end of round.</p>
+            <div class="control-buttons">
+                <button class="btn btn-success" onclick="awardPotToTeam(1)" style="font-size: 1.1em;">
+                    Award to <span id="awardTeam1Name">Team 1</span>
+                </button>
+                <button class="btn btn-primary" onclick="awardPotToTeam(2)" style="font-size: 1.1em;">
+                    Award to <span id="awardTeam2Name">Team 2</span>
+                </button>
+            </div>
+        </div>
+
         <!-- Strike & Round Controls -->
         <div class="score-control-group" style="margin-bottom: 20px;">
             <h3>Strikes & Round Controls</h3>
@@ -2399,6 +2413,7 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/Z" alt="Survey QR Code" style="width: 300px; 
             team1: { name: "TEAM 1", score: 0 },
             team2: { name: "TEAM 2", score: 0 },
             strikes: 0,
+            roundPot: 0, // Accumulated points for current round
             currentDisplay: 'intro'
         };
 
@@ -2663,14 +2678,9 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/Z" alt="Survey QR Code" style="width: 300px; 
                             <div class="answer-control-text">${index + 1}. ${answer.text}</div>
                             <div class="answer-control-points">${answer.points} points</div>
                         </div>
-                        <div style="display: flex; gap: 10px;">
-                            <button class="btn btn-success" onclick="revealAndAddPoints(${index}, 1)" style="flex: 1; font-size: 0.9em;">
-                                Reveal + ${gameState.team1.name}
-                            </button>
-                            <button class="btn btn-primary" onclick="revealAndAddPoints(${index}, 2)" style="flex: 1; font-size: 0.9em;">
-                                Reveal + ${gameState.team2.name}
-                            </button>
-                        </div>
+                        <button class="btn btn-success" onclick="revealAnswer(${index})" style="width: 100%;">
+                            Reveal Answer
+                        </button>
                     `;
                 }
                 answerControls.appendChild(control);
@@ -2680,13 +2690,18 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/Z" alt="Survey QR Code" style="width: 300px; 
             document.getElementById('team1ScoreInput').value = gameState.team1.score;
             document.getElementById('team2NameInput').value = gameState.team2.name;
             document.getElementById('team2ScoreInput').value = gameState.team2.score;
+            
+            // Update round pot display
+            document.getElementById('roundPotDisplay').textContent = gameState.roundPot;
+            document.getElementById('awardTeam1Name').textContent = gameState.team1.name;
+            document.getElementById('awardTeam2Name').textContent = gameState.team2.name;
         }
 
-        // Reveal answer and add points
-        function revealAndAddPoints(index, team) {
+        // Reveal answer and add points to round pot
+        function revealAnswer(index) {
             if (!gameState.answers[index].revealed) {
                 gameState.answers[index].revealed = true;
-                gameState[`team${team}`].score += gameState.answers[index].points;
+                gameState.roundPot += gameState.answers[index].points;
                 playReveal();
                 saveToStorage();
                 renderDisplay();
@@ -2696,10 +2711,13 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/Z" alt="Survey QR Code" style="width: 300px; 
 
         // Hide answer
         function hideAnswer(index) {
-            gameState.answers[index].revealed = false;
-            saveToStorage();
-            renderDisplay();
-            renderControls();
+            if (gameState.answers[index].revealed) {
+                gameState.answers[index].revealed = false;
+                gameState.roundPot -= gameState.answers[index].points;
+                saveToStorage();
+                renderDisplay();
+                renderControls();
+            }
         }
 
         // Update team score
@@ -2718,6 +2736,17 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/Z" alt="Survey QR Code" style="width: 300px; 
             saveToStorage();
             renderDisplay();
             renderControls();
+        }
+
+        // Award round pot to team
+        function awardPotToTeam(team) {
+            if (gameState.roundPot > 0) {
+                gameState[`team${team}`].score += gameState.roundPot;
+                gameState.roundPot = 0;
+                saveToStorage();
+                renderDisplay();
+                renderControls();
+            }
         }
 
         // Strike management
@@ -2748,6 +2777,7 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/Z" alt="Survey QR Code" style="width: 300px; 
         function resetRound() {
             gameState.answers.forEach(answer => answer.revealed = false);
             gameState.strikes = 0;
+            gameState.roundPot = 0;
             saveToStorage();
             renderDisplay();
             renderControls();
