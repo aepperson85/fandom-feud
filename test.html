@@ -2576,7 +2576,9 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/Z" alt="Survey QR Code" style="width: 300px; 
             const data = snapshot.val();
             if (data) {
                 gameState = data;
-                syncDisplays();
+                if (!document.getElementById('controlPanel').classList.contains('active')) {
+                    syncDisplays();
+                }
                 renderDisplay();
                 renderControls();
                 renderQuestionButtons();
