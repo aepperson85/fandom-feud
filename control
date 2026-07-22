@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fandom Feud - Control Panel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #0a1628;
+            color: white;
+        }
+
+        .control-panel {
+            height: 100vh;
+            padding: 20px;
+            background: #0a1628;
+            overflow-y: auto;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-weight: bold;
+            color: #ecf0f1;
+        }
+
+        .input-group input, .input-group textarea {
+            padding: 10px;
+            border: 2px solid #2a5298;
+            border-radius: 5px;
+            font-size: 16px;
+            background: #ecf0f1;
+        }
+
+        .input-group textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: monospace;
+        }
+
+        .question-bank {
+            background: #1e3c72;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 3px solid #000000;
+        }
+
+        .question-bank h2 {
+            color: #ffffff;
+            margin-bottom: 15px;
+        }
+
+        .score-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .score-control-group {
+            background: #1e3c72;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #000000;
+        }
+
+        .score-control-group h3 {
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+
+        .score-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .score-input input {
+            flex: 1;
+            padding: 8px;
+            border: 2px solid #2a5298;
+            border-radius: 5px;
+        }
+
+        .btn {
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-primary { background: #2a5298; color: white; border: 2px solid #000000; }
+        .btn-success { background: #1e3c72; color: white; border: 2px solid #000000; }
+        .btn-danger { background: #8b0000; color: white; border: 2px solid #000000; }
+        .btn-warning { background: #0a1628; color: white; border: 2px solid #2a5298; }
+        .btn-info { background: #2a5298; color: white; border: 2px solid #000000; }
+
+        .control-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .answers-list {
+            background: #1e3c72;
+            padding: 20px;
+            border-radius: 10px;
+            border: 3px solid #000000;
+        }
+
+        .answers-list h2 {
+            color: #ffffff;
+            margin-bottom: 15px;
+        }
+
+        .answer-control {
+            background: #0a1628;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 3px solid #2a5298;
+        }
+
+        .answer-control.revealed {
+            border-color: #ffffff;
+            background: #1e3c72;
+        }
+
+        .answer-info {
+            flex: 1;
+            color: white;
+        }
+
+        .answer-control-text {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .answer-control-points {
+            color: #ffffff;
+            font-size: 1.1em;
+        }
+
+        /* Mobile adjustments - this page is designed mobile-first */
+        @media (min-width: 769px) {
+            .desktop-only {
+                display: block;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .desktop-only {
+                display: none !important;
+            }
+            .control-buttons {
+                grid-template-columns: 1fr;
+            }
+            .btn {
+                font-size: 1.15em;
+                padding: 18px;
+            }
+            #questionSelect {
+                font-size: 1.2em;
+                padding: 15px;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="control-panel" id="controlPanel">
+
+        <!-- Question Bank -->
+        <div class="question-bank">
+            <h2>Current Question</h2>
+            <select id="questionSelect" onchange="loadQuestion(parseInt(this.value))" style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #2a5298; font-size: 1.1em;">
+                <!-- Options generated here -->
+            </select>
+        </div>
+
+        <!-- Question Editor -->
+        <div class="score-control-group desktop-only" style="margin-bottom: 20px;">
+            <h3>Edit Current Question</h3>
+            <div class="input-group">
+                <label>Question Text:</label>
+                <input type="text" id="editQuestion" placeholder="Enter question text">
+            </div>
+            <div class="input-group" style="margin-top: 10px;">
+                <label>Answers (one per line, format: "Answer, Points"):</label>
+                <textarea id="editAnswers" rows="8" placeholder="Answer 1, 45&#10;Answer 2, 30&#10;Answer 3, 15&#10;Answer 4, 7&#10;Answer 5, 3"></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="updateCurrentQuestion()" style="width: 100%; margin-top: 10px;">
+                Update Current Question
+            </button>
+            <button class="btn btn-warning" onclick="loadQuestionIntoEditor()" style="width: 100%; margin-top: 10px;">
+                Load Current Question Into Editor
+            </button>
+        </div>
+
+        <!-- Score Controls -->
+        <div class="score-controls desktop-only">
+            <div class="score-control-group">
+                <h3>Team 1</h3>
+                <div class="input-group" style="margin-bottom: 10px;">
+                    <label>Team Name:</label>
+                    <input type="text" id="team1NameInput" value="TEAM 1" placeholder="Team 1 Name">
+                    <button class="btn btn-primary" onclick="updateTeamName(1)" style="margin-top: 5px;">Update Name</button>
+                </div>
+                <div class="score-input">
+                    <input type="number" id="team1ScoreInput" value="0" min="0">
+                    <button class="btn btn-primary" onclick="updateTeamScore(1)">Update Score</button>
+                </div>
+            </div>
+
+            <div class="score-control-group">
+                <h3>Team 2</h3>
+                <div class="input-group" style="margin-bottom: 10px;">
+                    <label>Team Name:</label>
+                    <input type="text" id="team2NameInput" value="TEAM 2" placeholder="Team 2 Name">
+                    <button class="btn btn-primary" onclick="updateTeamName(2)" style="margin-top: 5px;">Update Name</button>
+                </div>
+                <div class="score-input">
+                    <input type="number" id="team2ScoreInput" value="0" min="0">
+                    <button class="btn btn-primary" onclick="updateTeamScore(2)">Update Score</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Round Pot Control -->
+        <div class="score-control-group" style="margin-bottom: 20px; background: #1e3c72; border: 3px solid #ffffff;">
+            <h3 style="color: #ffffff;">Round Pot: <span id="roundPotDisplay" style="color: #ffffff;">0</span> Points</h3>
+            <p style="color: #ffffff; opacity: 0.8; margin: 10px 0;">Revealed answers accumulate here. Award to winning team at end of round.</p>
+            <div class="control-buttons">
+                <button class="btn btn-success" onclick="awardPotToTeam(1)" style="font-size: 1.1em;">
+                    Award to <span id="awardTeam1Name">Team 1</span>
+                </button>
+                <button class="btn btn-primary" onclick="awardPotToTeam(2)" style="font-size: 1.1em;">
+                    Award to <span id="awardTeam2Name">Team 2</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Strike & Round Controls -->
+        <div class="score-control-group" style="margin-bottom: 20px;">
+            <h3>Strikes & Round Controls</h3>
+            <div class="control-buttons">
+                <button class="btn btn-danger" onclick="addStrike()">Add Strike (X)</button>
+                <button class="btn btn-warning" onclick="removeStrike()">Remove Strike</button>
+                <button class="btn btn-info" onclick="clearStrikes()">Clear Strikes</button>
+                <button class="btn btn-danger" onclick="resetAll()">Reset All</button>
+            </div>
+        </div>
+
+        <!-- Answer Controls -->
+        <div class="answers-list">
+            <h2>Answer Controls - Current Question</h2>
+            <div id="answerControls">
+                <!-- Answer controls will be dynamically generated here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyDHCUOL96pVa4F44OeOX5j6tgAm739XGeM",
+          authDomain: "fandom-feud.firebaseapp.com",
+          databaseURL: "https://fandom-feud-default-rtdb.firebaseio.com",
+          projectId: "fandom-feud",
+          storageBucket: "fandom-feud.firebasestorage.app",
+          messagingSenderId: "355989427943",
+          appId: "1:355989427943:web:6573493a3d273d326cf442"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        let firebaseReady = false;
+
+        // Question Bank - 12 pre-loaded questions (Sci-Fi & Paranormal Edition)
+        let questionBank = [
+            {
+                question: "NAME A FAMOUS ALIEN SPECIES FROM SCI-FI",
+                answers: [
+                    { text: "Klingon", points: 35 },
+                    { text: "Xenomorph", points: 25 },
+                    { text: "Wookiee", points: 15 },
+                    { text: "Vulcan", points: 12 },
+                    { text: "Predator", points: 8 },
+                    { text: "Ewok", points: 5 }
+                ]
+            },
+            {
+                question: "NAME SOMETHING YOU'D ENCOUNTER IN A HAUNTED HOUSE",
+                answers: [
+                    { text: "Ghost", points: 45 },
+                    { text: "Cold spots", points: 20 },
+                    { text: "Strange noises", points: 18 },
+                    { text: "Moving objects", points: 12 },
+                    { text: "Creepy dolls", points: 5 }
+                ]
+            },
+            {
+                question: "NAME A MODERN SCI-FI MOVIE (Post-2000)",
+                answers: [
+                    { text: "Avatar", points: 35 },
+                    { text: "The Matrix", points: 25 },
+                    { text: "Inception", points: 20 },
+                    { text: "Interstellar", points: 12 },
+                    { text: "Blade Runner 2049", points: 8 }
+                ]
+            },
+            {
+                question: "NAME A TYPE OF CRYPTID OR MONSTER",
+                answers: [
+                    { text: "Bigfoot", points: 40 },
+                    { text: "Loch Ness Monster", points: 30 },
+                    { text: "Mothman", points: 15 },
+                    { text: "Chupacabra", points: 10 },
+                    { text: "Jersey Devil", points: 5 }
+                ]
+            },
+            {
+                question: "NAME SOMETHING PARANORMAL INVESTIGATORS CARRY",
+                answers: [
+                    { text: "EMF detector", points: 35 },
+                    { text: "Camera", points: 30 },
+                    { text: "Voice recorder", points: 20 },
+                    { text: "Flashlight", points: 10 },
+                    { text: "Sage", points: 5 }
+                ]
+            },
+            {
+                question: "NAME A FAMOUS TIME TRAVEL MOVIE OR SHOW",
+                answers: [
+                    { text: "Doctor Who", points: 40 },
+                    { text: "Back to the Future", points: 30 },
+                    { text: "The Terminator", points: 15 },
+                    { text: "Quantum Leap", points: 10 },
+                    { text: "Groundhog Day", points: 5 }
+                ]
+            },
+            {
+                question: "NAME A FAMOUS CONSPIRACY THEORY",
+                answers: [
+                    { text: "Area 51", points: 40 },
+                    { text: "Flat Earth", points: 25 },
+                    { text: "Illuminati", points: 18 },
+                    { text: "Moon landing fake", points: 12 },
+                    { text: "Chemtrails", points: 5 }
+                ]
+            },
+            {
+                question: "NAME A REASON YOU'D VISIT A PSYCHIC",
+                answers: [
+                    { text: "Future prediction", points: 35 },
+                    { text: "Talk to deceased loved one", points: 30 },
+                    { text: "Relationship advice", points: 18 },
+                    { text: "Career guidance", points: 12 },
+                    { text: "Find lost item", points: 5 }
+                ]
+            },
+            {
+                question: "NAME A FAMOUS PARANORMAL FICTION SERIES",
+                answers: [
+                    { text: "The X-Files", points: 35 },
+                    { text: "Supernatural", points: 30 },
+                    { text: "Buffy the Vampire Slayer", points: 20 },
+                    { text: "The Dresden Files", points: 10 },
+                    { text: "American Horror Story", points: 5 }
+                ]
+            },
+            {
+                question: "NAME SOMETHING FOUND AT A SÉANCE",
+                answers: [
+                    { text: "Ouija board", points: 35 },
+                    { text: "Candles", points: 30 },
+                    { text: "Crystal ball", points: 20 },
+                    { text: "Tarot cards", points: 10 },
+                    { text: "Incense", points: 5 }
+                ]
+            },
+            {
+                question: "NAME A DYSTOPIAN SCI-FI BOOK OR SERIES",
+                answers: [
+                    { text: "1984", points: 35 },
+                    { text: "The Hunger Games", points: 30 },
+                    { text: "Brave New World", points: 20 },
+                    { text: "The Handmaid's Tale", points: 10 },
+                    { text: "Fahrenheit 451", points: 5 }
+                ]
+            },
+            {
+                question: "NAME A SIGN YOUR HOUSE MIGHT BE HAUNTED",
+                answers: [
+                    { text: "Doors opening/closing", points: 35 },
+                    { text: "Unexplained sounds", points: 30 },
+                    { text: "Objects moving", points: 20 },
+                    { text: "Shadow figures", points: 10 },
+                    { text: "Pets acting strange", points: 5 }
+                ]
+            }
+        ];
+
+        // Game state
+        let gameState = {
+            currentQuestionIndex: 0,
+            question: "",
+            answers: [],
+            team1: { name: "TEAM 1", score: 0 },
+            team2: { name: "TEAM 2", score: 0 },
+            strikes: 0,
+            roundPot: 0
+        };
+
+        // Audio context for sound effects
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioContext = new AudioContext();
+
+        // Generate aggressive buzzer sound
+        function playBuzzer() {
+            const oscillator1 = audioContext.createOscillator();
+            const oscillator2 = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator1.connect(gainNode);
+            oscillator2.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator1.frequency.value = 150;
+            oscillator2.frequency.value = 155;
+            oscillator1.type = 'sawtooth';
+            oscillator2.type = 'square';
+
+            gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.8);
+
+            oscillator1.start(audioContext.currentTime);
+            oscillator2.start(audioContext.currentTime);
+            oscillator1.stop(audioContext.currentTime + 0.8);
+            oscillator2.stop(audioContext.currentTime + 0.8);
+        }
+
+        // Generate reveal sound
+        function playReveal() {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            oscillator.frequency.setValueAtTime(400, audioContext.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(800, audioContext.currentTime + 0.2);
+            oscillator.type = 'sine';
+
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.3);
+        }
+
+        // Save to Firebase (syncs to the display page and any other control device instantly)
+        function saveToStorage() {
+            db.ref('questionBank').set(questionBank);
+            db.ref('gameState').set(gameState);
+        }
+
+        // Listen for changes from Firebase, from any device, in real time
+        db.ref('questionBank').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                questionBank = data;
+                renderQuestionButtons();
+            }
+        });
+
+        db.ref('gameState').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                gameState = data;
+                renderControls();
+                renderQuestionButtons();
+            } else if (!firebaseReady) {
+                loadQuestion(0);
+            }
+            firebaseReady = true;
+        });
+
+        // Load question
+        function loadQuestion(index) {
+            if (index >= 0 && index < questionBank.length) {
+                gameState.currentQuestionIndex = index;
+                gameState.question = questionBank[index].question;
+                gameState.answers = questionBank[index].answers.map(a => ({
+                    text: a.text, points: a.points, revealed: false
+                }));
+                gameState.strikes = 0;
+                gameState.roundPot = 0;
+
+                saveToStorage();
+                renderControls();
+                renderQuestionButtons();
+            }
+        }
+
+        // Render question dropdown
+        function renderQuestionButtons() {
+            const select = document.getElementById('questionSelect');
+            select.innerHTML = '';
+            questionBank.forEach((q, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = `Question ${index + 1}`;
+                if (index === gameState.currentQuestionIndex) option.selected = true;
+                select.appendChild(option);
+            });
+        }
+
+        // Render controls
+        function renderControls() {
+            const answerControls = document.getElementById('answerControls');
+            answerControls.innerHTML = '';
+
+            gameState.answers.forEach((answer, index) => {
+                const control = document.createElement('div');
+                control.className = `answer-control ${answer.revealed ? 'revealed' : ''}`;
+
+                if (answer.revealed) {
+                    control.innerHTML = `
+                        <div class="answer-info">
+                            <div class="answer-control-text">${index + 1}. ${answer.text}</div>
+                            <div class="answer-control-points">${answer.points} points - REVEALED</div>
+                        </div>
+                        <button class="btn btn-warning" onclick="hideAnswer(${index})">Hide</button>
+                    `;
+                } else {
+                    control.innerHTML = `
+                        <div class="answer-info">
+                            <div class="answer-control-text">${index + 1}. ${answer.text}</div>
+                            <div class="answer-control-points">${answer.points} points</div>
+                        </div>
+                        <button class="btn btn-success" onclick="revealAnswer(${index})" style="width: 100%;">
+                            Reveal Answer
+                        </button>
+                    `;
+                }
+                answerControls.appendChild(control);
+            });
+
+            document.getElementById('team1NameInput').value = gameState.team1.name;
+            document.getElementById('team1ScoreInput').value = gameState.team1.score;
+            document.getElementById('team2NameInput').value = gameState.team2.name;
+            document.getElementById('team2ScoreInput').value = gameState.team2.score;
+
+            document.getElementById('roundPotDisplay').textContent = gameState.roundPot;
+            document.getElementById('awardTeam1Name').textContent = gameState.team1.name;
+            document.getElementById('awardTeam2Name').textContent = gameState.team2.name;
+        }
+
+        // Reveal answer and add points to round pot
+        function revealAnswer(index) {
+            if (!gameState.answers[index].revealed) {
+                gameState.answers[index].revealed = true;
+                gameState.roundPot += gameState.answers[index].points;
+                playReveal();
+                saveToStorage();
+                renderControls();
+            }
+        }
+
+        // Hide answer
+        function hideAnswer(index) {
+            if (gameState.answers[index].revealed) {
+                gameState.answers[index].revealed = false;
+                gameState.roundPot -= gameState.answers[index].points;
+                saveToStorage();
+                renderControls();
+            }
+        }
+
+        // Update team score
+        function updateTeamScore(team) {
+            const score = parseInt(document.getElementById(`team${team}ScoreInput`).value) || 0;
+            gameState[`team${team}`].score = score;
+            saveToStorage();
+            renderControls();
+        }
+
+        // Update team name
+        function updateTeamName(team) {
+            const name = document.getElementById(`team${team}NameInput`).value.trim().toUpperCase() || `TEAM ${team}`;
+            gameState[`team${team}`].name = name;
+            saveToStorage();
+            renderControls();
+        }
+
+        // Award round pot to team
+        function awardPotToTeam(team) {
+            if (gameState.roundPot > 0) {
+                gameState[`team${team}`].score += gameState.roundPot;
+                gameState.roundPot = 0;
+                saveToStorage();
+                renderControls();
+            }
+        }
+
+        // Strike management
+        function addStrike() {
+            if (gameState.strikes < 3) {
+                gameState.strikes++;
+                playBuzzer();
+                saveToStorage();
+                renderControls();
+            }
+        }
+
+        function removeStrike() {
+            if (gameState.strikes > 0) {
+                gameState.strikes--;
+                saveToStorage();
+                renderControls();
+            }
+        }
+
+        function clearStrikes() {
+            gameState.strikes = 0;
+            saveToStorage();
+            renderControls();
+        }
+
+        // Reset everything
+        function resetAll() {
+            if (confirm('Are you sure you want to reset everything?')) {
+                gameState.team1.score = 0;
+                gameState.team2.score = 0;
+                gameState.strikes = 0;
+                gameState.roundPot = 0;
+                gameState.answers.forEach(answer => answer.revealed = false);
+                saveToStorage();
+                renderControls();
+            }
+        }
+
+        // Question Editor Functions
+        function loadQuestionIntoEditor() {
+            const currentQ = questionBank[gameState.currentQuestionIndex];
+            document.getElementById('editQuestion').value = currentQ.question;
+
+            const answersText = currentQ.answers.map(a => `${a.text}, ${a.points}`).join('\n');
+            document.getElementById('editAnswers').value = answersText;
+        }
+
+        function updateCurrentQuestion() {
+            const questionText = document.getElementById('editQuestion').value.trim();
+            const answersText = document.getElementById('editAnswers').value.trim();
+
+            if (!questionText) {
+                alert('Please enter a question');
+                return;
+            }
+
+            if (!answersText) {
+                alert('Please enter at least one answer');
+                return;
+            }
+
+            // Parse answers
+            const answerLines = answersText.split('\n').filter(line => line.trim());
+            const answers = [];
+
+            for (let line of answerLines) {
+                const parts = line.split(',');
+                if (parts.length >= 2) {
+                    const text = parts[0].trim();
+                    const points = parseInt(parts[1].trim()) || 0;
+                    if (text) {
+                        answers.push({ text, points });
+                    }
+                }
+            }
+
+            if (answers.length === 0) {
+                alert('Please enter answers in format: "Answer, Points"');
+                return;
+            }
+
+            // Update question bank
+            questionBank[gameState.currentQuestionIndex] = {
+                question: questionText,
+                answers: answers
+            };
+
+            // Reload the question to display
+            loadQuestion(gameState.currentQuestionIndex);
+
+            alert('Question updated successfully!');
+        }
+
+        // Initialize (Firebase listeners above load everything automatically)
+        renderQuestionButtons();
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            if (e.key.toLowerCase() === 'x') addStrike();
+        });
+    </script>
+</body>
+</html>
