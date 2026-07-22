@@ -623,6 +623,28 @@
                 display: none !important;
             }
         }
+
+        /* Mobile control panel adjustments */
+        @media (max-width: 768px) {
+            .desktop-only {
+                display: none !important;
+            }
+            .display-buttons {
+                flex-direction: column;
+            }
+            .control-buttons {
+                grid-template-columns: 1fr;
+            }
+            .btn {
+                font-size: 1.15em;
+                padding: 18px;
+            }
+            #questionSelect {
+                font-size: 1.2em;
+                padding: 15px;
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -2168,13 +2190,11 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/Z" alt="Survey QR Code" style="width: 300px; 
 
     <!-- CONTROL PANEL -->
     <div class="control-panel" id="controlPanel">
-        <div class="control-header">
-            <h1>🎮 Fandom Feud Control Panel - 2D Con 2026</h1>
-        </div>
+     
 
         <!-- Display Control -->
         <div class="display-controls">
-            <h2>📺 Audience Display Control</h2>
+            <h2>Audience Display Control</h2>
             <div class="display-buttons">
                 <button class="display-btn show-intro" onclick="setMainDisplay('intro')">
                     Show Intro Screen
@@ -2190,14 +2210,14 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/Z" alt="Survey QR Code" style="width: 300px; 
 
         <!-- Question Bank -->
         <div class="question-bank">
-            <h2>Question Bank - Click to Load</h2>
-            <div class="question-buttons" id="questionButtons">
-                <!-- Question buttons will be generated here -->
-            </div>
+            <h2>Current Question</h2>
+            <select id="questionSelect" onchange="loadQuestion(parseInt(this.value))" style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #2a5298; font-size: 1.1em;">
+                <!-- Options generated here -->
+            </select>
         </div>
 
         <!-- Question Editor -->
-        <div class="score-control-group" style="margin-bottom: 20px;">
+        <div class="score-control-group desktop-only" style="margin-bottom: 20px;">
             <h3>Edit Current Question</h3>
             <div class="input-group">
                 <label>Question Text:</label>
@@ -2216,7 +2236,7 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/Z" alt="Survey QR Code" style="width: 300px; 
         </div>
 
         <!-- Score Controls -->
-        <div class="score-controls">
+        <div class="score-controls desktop-only">
             <div class="score-control-group">
                 <h3>Team 1</h3>
                 <div class="input-group" style="margin-bottom: 10px;">
@@ -2265,8 +2285,7 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/Z" alt="Survey QR Code" style="width: 300px; 
                 <button class="btn btn-danger" onclick="addStrike()">Add Strike (X)</button>
                 <button class="btn btn-warning" onclick="removeStrike()">Remove Strike</button>
                 <button class="btn btn-info" onclick="clearStrikes()">Clear Strikes</button>
-                <button class="btn btn-warning" onclick="resetRound()">Reset Round (R)</button>
-                <button class="btn btn-danger" onclick="clearAll()">Clear All Scores</button>
+                <button class="btn btn-danger" onclick="resetAll()">Reset All</button>
             </div>
         </div>
 
@@ -2610,6 +2629,7 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/Z" alt="Survey QR Code" style="width: 300px; 
                     text: a.text, points: a.points, revealed: false
                 }));
                 gameState.strikes = 0;
+                gameState.roundPot = 0;
                 
                 saveToStorage();
                 renderDisplay();
@@ -2618,16 +2638,16 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/Z" alt="Survey QR Code" style="width: 300px; 
             }
         }
 
-        // Render question buttons
+        // Render question dropdown
         function renderQuestionButtons() {
-            const container = document.getElementById('questionButtons');
-            container.innerHTML = '';
+            const select = document.getElementById('questionSelect');
+            select.innerHTML = '';
             questionBank.forEach((q, index) => {
-                const btn = document.createElement('button');
-                btn.className = `question-btn ${index === gameState.currentQuestionIndex ? 'active' : ''}`;
-                btn.textContent = `Q${index + 1}`;
-                btn.onclick = () => loadQuestion(index);
-                container.appendChild(btn);
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = `Question ${index + 1}`;
+                if (index === gameState.currentQuestionIndex) option.selected = true;
+                select.appendChild(option);
             });
         }
 
@@ -2777,22 +2797,13 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/Z" alt="Survey QR Code" style="width: 300px; 
             renderDisplay();
         }
 
-        // Reset round
-        function resetRound() {
-            gameState.answers.forEach(answer => answer.revealed = false);
-            gameState.strikes = 0;
-            gameState.roundPot = 0;
-            saveToStorage();
-            renderDisplay();
-            renderControls();
-        }
-
-        // Clear all
-        function clearAll() {
-            if (confirm('Are you sure you want to reset all scores?')) {
+        // Reset everything
+        function resetAll() {
+            if (confirm('Are you sure you want to reset everything?')) {
                 gameState.team1.score = 0;
                 gameState.team2.score = 0;
                 gameState.strikes = 0;
+                gameState.roundPot = 0;
                 gameState.answers.forEach(answer => answer.revealed = false);
                 saveToStorage();
                 renderDisplay();
@@ -2863,7 +2874,6 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/Z" alt="Survey QR Code" style="width: 300px; 
             if (document.getElementById('controlPanel').classList.contains('active')) {
                 if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
                 if (e.key.toLowerCase() === 'x') addStrike();
-                if (e.key.toLowerCase() === 'r') resetRound();
             }
         });
     </script>
