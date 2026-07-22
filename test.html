@@ -559,10 +559,8 @@
     </button>
 
     <!-- Screen Switching Buttons (only visible on control panel) -->
-    <div class="screen-controls" id="screenControls">
-        <button class="screen-btn" onclick="switchToScreen('intro')">In</button>
+    <div class="screen main-display active" id="gameScreen">
         <button class="screen-btn" onclick="switchToScreen('game')">Game</button>
-        <button class="screen-btn" onclick="switchToScreen('outro')">Out</button>
         <button class="screen-btn active" onclick="switchToScreen('control')">Control</button>
     </div>
 
@@ -868,7 +866,7 @@
             team2: { name: "TEAM 2", score: 0 },
             strikes: 0,
             roundPot: 0, // Accumulated points for current round
-            currentDisplay: 'intro'
+            currentDisplay: 'game'
         };
 
         // Audio context for sound effects
