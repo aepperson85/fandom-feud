@@ -610,22 +610,6 @@
     <div class="control-panel" id="controlPanel">
      
 
-        <!-- Display Control -->
-        <div class="display-controls">
-            <h2>Audience Display Control</h2>
-            <div class="display-buttons">
-                <button class="display-btn show-intro" onclick="setMainDisplay('intro')">
-                    Show Intro Screen
-                </button>
-                <button class="display-btn show-game active-display" onclick="setMainDisplay('game')">
-                    Show Game Screen
-                </button>
-                <button class="display-btn show-outro" onclick="setMainDisplay('outro')">
-                    Show Outro Screen
-                </button>
-            </div>
-        </div>
-
         <!-- Question Bank -->
         <div class="question-bank">
             <h2>Current Question</h2>
@@ -931,20 +915,7 @@
             event.target.classList.add('active');
         }
 
-        function setMainDisplay(displayType) {
-            gameState.currentDisplay = displayType;
-            saveToStorage();
-            
-            // Only sync displays if we're NOT on the control panel
-            // Control panel should stay on control panel
-            if (!document.getElementById('controlPanel').classList.contains('active')) {
-                syncDisplays();
-            }
-            
-            document.querySelectorAll('.display-btn').forEach(btn => btn.classList.remove('active-display'));
-            event.target.classList.add('active-display');
-        }
-
+       
         // Generate aggressive buzzer sound
         function playBuzzer() {
             const oscillator1 = audioContext.createOscillator();
@@ -1013,9 +984,6 @@
             const data = snapshot.val();
             if (data) {
                 gameState = data;
-                if (!document.getElementById('controlPanel').classList.contains('active')) {
-                    syncDisplays();
-                }
                 renderDisplay();
                 renderControls();
                 renderQuestionButtons();
