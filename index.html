@@ -2279,7 +2279,22 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/Z" alt="Survey QR Code" style="width: 300px; 
         </div>
     </div>
 
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     <script>
+        // Firebase configuration
+        const firebaseConfig = {
+          apiKey: "AIzaSyDHCUOL96pVa4F44OeOX5j6tgAm739XGeM",
+          authDomain: "fandom-feud.firebaseapp.com",
+          databaseURL: "https://fandom-feud-default-rtdb.firebaseio.com",
+          projectId: "fandom-feud",
+          storageBucket: "fandom-feud.firebasestorage.app",
+          messagingSenderId: "355989427943",
+          appId: "1:355989427943:web:6573493a3d273d326cf442"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        let firebaseReady = false;
         // Question Bank - 12 pre-loaded questions (Sci-Fi & Paranormal Edition)
         let questionBank = [
             {
@@ -2542,46 +2557,35 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/Z" alt="Survey QR Code" style="width: 300px; 
             oscillator.stop(audioContext.currentTime + 0.3);
         }
 
-        // Save to localStorage
+        // Save to Firebase (syncs across every device instantly)
         function saveToStorage() {
-            localStorage.setItem('fandomFeudQuestionBank', JSON.stringify(questionBank));
-            localStorage.setItem('fandomFeudState', JSON.stringify(gameState));
-            localStorage.setItem('fandomFeudUpdate', Date.now().toString());
+            db.ref('questionBank').set(questionBank);
+            db.ref('gameState').set(gameState);
         }
 
-        // Load from localStorage
-        function loadFromStorage() {
-            const savedBank = localStorage.getItem('fandomFeudQuestionBank');
-            if (savedBank) {
-                try { questionBank = JSON.parse(savedBank); }
-                catch (e) { console.error('Error loading question bank:', e); }
+        // Listen for changes from Firebase, from any device, in real time
+        db.ref('questionBank').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                questionBank = data;
+                renderQuestionButtons();
             }
-            
-            const savedState = localStorage.getItem('fandomFeudState');
-            if (savedState) {
-                try {
-                    const loaded = JSON.parse(savedState);
-                    gameState.team1 = loaded.team1;
-                    gameState.team2 = loaded.team2;
-                    gameState.strikes = loaded.strikes;
-                    gameState.currentQuestionIndex = loaded.currentQuestionIndex;
-                    gameState.currentDisplay = loaded.currentDisplay || 'intro';
-                    if (loaded.question) {
-                        gameState.question = loaded.question;
-                        gameState.answers = loaded.answers;
-                    }
-                } catch (e) { console.error('Error loading game state:', e); }
-            }
-        }
+        });
 
-        // Listen for storage changes (for multi-window sync)
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'fandomFeudUpdate') {
-                loadFromStorage();
-                syncDisplays();
+        db.ref('gameState').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                gameState = data;
+                if (!document.getElementById('controlPanel').classList.contains('active')) {
+                    syncDisplays();
+                }
                 renderDisplay();
                 renderControls();
+                renderQuestionButtons();
+            } else if (!firebaseReady) {
+                loadQuestion(0);
             }
+            firebaseReady = true;
         });
 
         // Sync display screens based on currentDisplay state
@@ -2851,12 +2855,7 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAf/Z" alt="Survey QR Code" style="width: 300px; 
             alert('Question updated successfully!');
         }
 
-        // Initialize
-        loadFromStorage();
-        if (!gameState.question) loadQuestion(0);
-        syncDisplays();
-        renderDisplay();
-        renderControls();
+        // Initialize (Firebase listeners above load everything automatically)
         renderQuestionButtons();
 
         // Keyboard shortcuts
