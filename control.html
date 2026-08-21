@@ -302,130 +302,284 @@
         let firebaseReady = false;
 
         // Question Bank - 12 pre-loaded questions (Sci-Fi & Paranormal Edition)
-        let questionBank = [
+         let questionBank = [
             {
-                question: "NAME A FAMOUS ALIEN SPECIES FROM SCI-FI",
+                question: "WHO IS THE BEST MARIO KART CHARACTER?",
                 answers: [
-                    { text: "Klingon", points: 35 },
-                    { text: "Xenomorph", points: 25 },
-                    { text: "Wookiee", points: 15 },
-                    { text: "Vulcan", points: 12 },
-                    { text: "Predator", points: 8 },
-                    { text: "Ewok", points: 5 }
+                    { text: "Yoshi", points: 23 },
+                    { text: "Toad", points: 12 },
+                    { text: "Rosalina", points: 8 },
+                    { text: "Peach", points: 7 },
+                    { text: "Luigi", points: 5 },
+                    { text: "Wario", points: 5 },
+                    { text: "Mario", points: 4 }
                 ]
             },
             {
-                question: "NAME SOMETHING YOU'D ENCOUNTER IN A HAUNTED HOUSE",
+                question: "NAME A POPULAR TRADING CARD GAME (TCG)",
                 answers: [
-                    { text: "Ghost", points: 45 },
-                    { text: "Cold spots", points: 20 },
-                    { text: "Strange noises", points: 18 },
-                    { text: "Moving objects", points: 12 },
-                    { text: "Creepy dolls", points: 5 }
+                    { text: "Magic: The Gathering", points: 39 },
+                    { text: "Pokémon TCG", points: 30 },
+                    { text: "Yu-Gi-Oh!", points: 7 },
+                    { text: "One Piece Card Game", points: 4 },
+                    { text: "Lorcana", points: 3 },
+                    { text: "Star Wars Unlimited", points: 2 }
                 ]
             },
             {
-                question: "NAME A MODERN SCI-FI MOVIE (Post-2000)",
+                question: "NAME A DUNGEONS AND DRAGONS MONSTER",
                 answers: [
-                    { text: "Avatar", points: 35 },
-                    { text: "The Matrix", points: 25 },
-                    { text: "Inception", points: 20 },
-                    { text: "Interstellar", points: 12 },
-                    { text: "Blade Runner 2049", points: 8 }
+                    { text: "Beholder", points: 30 },
+                    { text: "Mimic", points: 13 },
+                    { text: "Gelatinous Cube", points: 11 },
+                    { text: "Dragon", points: 5 },
+                    { text: "Displacer Beast", points: 4 },
+                    { text: "Owlbear", points: 4 },
+                    { text: "Goblin", points: 3 }
                 ]
             },
             {
-                question: "NAME A TYPE OF CRYPTID OR MONSTER",
+                question: "NAME A TYPE OF POKÉMON",
                 answers: [
-                    { text: "Bigfoot", points: 40 },
-                    { text: "Loch Ness Monster", points: 30 },
-                    { text: "Mothman", points: 15 },
-                    { text: "Chupacabra", points: 10 },
-                    { text: "Jersey Devil", points: 5 }
+                    { text: "Fire", points: 16 },
+                    { text: "Water", points: 13 },
+                    { text: "Fairy", points: 11 },
+                    { text: "Ghost", points: 11 },
+                    { text: "Grass", points: 9 },
+                    { text: "Electric", points: 6 },
+                    { text: "Psychic", points: 4 }
                 ]
             },
             {
-                question: "NAME SOMETHING PARANORMAL INVESTIGATORS CARRY",
+                question: "NAME A BOARD GAME THAT THE EXPANSION IS A MUST HAVE",
                 answers: [
-                    { text: "EMF detector", points: 35 },
-                    { text: "Camera", points: 30 },
-                    { text: "Voice recorder", points: 20 },
-                    { text: "Flashlight", points: 10 },
-                    { text: "Sage", points: 5 }
+                    { text: "Cards Against Humanity", points: 19 },
+                    { text: "Catan", points: 15 },
+                    { text: "Dominion", points: 12 },
+                    { text: "Red Dragon Inn", points: 10 },
+                    { text: "Ticket to Ride", points: 10 },
+                    { text: "Wingspan", points: 9 }
                 ]
             },
             {
-                question: "NAME A FAMOUS TIME TRAVEL MOVIE OR SHOW",
+                question: "WHAT CONSOLE HAS THE WORST CONTROLLER?",
                 answers: [
-                    { text: "Doctor Who", points: 40 },
-                    { text: "Back to the Future", points: 30 },
-                    { text: "The Terminator", points: 15 },
-                    { text: "Quantum Leap", points: 10 },
-                    { text: "Groundhog Day", points: 5 }
+                    { text: "Nintendo 64", points: 28 },
+                    { text: "Xbox Original", points: 10 },
+                    { text: "Atari", points: 9 },
+                    { text: "Nintendo Wii", points: 8 },
+                    { text: "Nintendo Switch", points: 8 },
+                    { text: "PlayStation Original", points: 6 },
+                    { text: "GameCube", points: 5 }
                 ]
             },
             {
-                question: "NAME A FAMOUS CONSPIRACY THEORY",
+                question: "IN THE MARIO FRANCHISE, WHAT'S THE BEST GAME?",
                 answers: [
-                    { text: "Area 51", points: 40 },
-                    { text: "Flat Earth", points: 25 },
-                    { text: "Illuminati", points: 18 },
-                    { text: "Moon landing fake", points: 12 },
-                    { text: "Chemtrails", points: 5 }
+                    { text: "Super Mario Galaxy", points: 17 },
+                    { text: "Super Mario Bros. 3", points: 14 },
+                    { text: "Super Mario World", points: 10 },
+                    { text: "Super Mario 64", points: 9 },
+                    { text: "Super Mario Odyssey", points: 8 },
+                    { text: "Super Mario Sunshine", points: 7 }
                 ]
             },
             {
-                question: "NAME A REASON YOU'D VISIT A PSYCHIC",
+                question: "NAME A GAME THAT USES A STANDARD DECK OF CARDS",
                 answers: [
-                    { text: "Future prediction", points: 35 },
-                    { text: "Talk to deceased loved one", points: 30 },
-                    { text: "Relationship advice", points: 18 },
-                    { text: "Career guidance", points: 12 },
-                    { text: "Find lost item", points: 5 }
+                    { text: "Poker", points: 19 },
+                    { text: "Cribbage", points: 12 },
+                    { text: "Solitaire", points: 10 },
+                    { text: "War", points: 7 },
+                    { text: "Go Fish", points: 5 },
+                    { text: "Hearts", points: 5 },
+                    { text: "Gin / Rummy", points: 4 }
                 ]
             },
             {
-                question: "NAME A FAMOUS PARANORMAL FICTION SERIES",
+                question: "NAME A POPULAR \"RETRO\" CONSOLE",
                 answers: [
-                    { text: "The X-Files", points: 35 },
-                    { text: "Supernatural", points: 30 },
-                    { text: "Buffy the Vampire Slayer", points: 20 },
-                    { text: "The Dresden Files", points: 10 },
-                    { text: "American Horror Story", points: 5 }
+                    { text: "Super Nintendo Entertainment System", points: 19 },
+                    { text: "Atari", points: 16 },
+                    { text: "Nintendo 64", points: 14 },
+                    { text: "Nintendo Entertainment System", points: 14 },
+                    { text: "Sega Genesis", points: 7 },
+                    { text: "GameCube", points: 4 },
+                    { text: "Gameboy", points: 2 }
                 ]
             },
             {
-                question: "NAME SOMETHING FOUND AT A SÉANCE",
+                question: "NAME A MINECRAFT ANIMAL OR MONSTER",
                 answers: [
-                    { text: "Ouija board", points: 35 },
-                    { text: "Candles", points: 30 },
-                    { text: "Crystal ball", points: 20 },
-                    { text: "Tarot cards", points: 10 },
-                    { text: "Incense", points: 5 }
+                    { text: "Creeper", points: 37 },
+                    { text: "Pig", points: 10 },
+                    { text: "Enderman", points: 9 },
+                    { text: "Sheep", points: 6 },
+                    { text: "Chicken", points: 5 },
+                    { text: "Zombie", points: 5 },
+                    { text: "Axolotl", points: 3 }
                 ]
             },
             {
-                question: "NAME A DYSTOPIAN SCI-FI BOOK OR SERIES",
+                question: "WHAT TOOL/SUPPLY IS A MUST HAVE IN A COSPLAY EMERGENCY REPAIR KIT?",
                 answers: [
-                    { text: "1984", points: 35 },
-                    { text: "The Hunger Games", points: 30 },
-                    { text: "Brave New World", points: 20 },
-                    { text: "The Handmaid's Tale", points: 10 },
-                    { text: "Fahrenheit 451", points: 5 }
+                    { text: "Safety Pins", points: 22 },
+                    { text: "Needle and Thread", points: 15 },
+                    { text: "Duct Tape", points: 10 },
+                    { text: "Fabric Tape", points: 10 },
+                    { text: "Hot Glue Gun", points: 8 },
+                    { text: "Super Glue", points: 8 }
                 ]
             },
             {
-                question: "NAME A SIGN YOUR HOUSE MIGHT BE HAUNTED",
+                question: "NAME A DROID IN THE STAR WARS FRANCHISE",
                 answers: [
-                    { text: "Doors opening/closing", points: 35 },
-                    { text: "Unexplained sounds", points: 30 },
-                    { text: "Objects moving", points: 20 },
-                    { text: "Shadow figures", points: 10 },
-                    { text: "Pets acting strange", points: 5 }
+                    { text: "R2-D2", points: 41 },
+                    { text: "C-3PO", points: 20 },
+                    { text: "BB-8", points: 10 },
+                    { text: "IG-88", points: 5 },
+                    { text: "K-2SO", points: 4 },
+                    { text: "Chopper (C1-10P)", points: 4 },
+                    { text: "Gonk", points: 2 }
+                ]
+            },
+            {
+                question: "WHAT IS THE BEST LIVE ACTION MOVIE BASED ON A VIDEO GAME?",
+                answers: [
+                    { text: "Sonic the Hedgehog", points: 18 },
+                    { text: "Mortal Kombat", points: 15 },
+                    { text: "Resident Evil", points: 12 },
+                    { text: "Pokémon Detective Pikachu", points: 10 },
+                    { text: "The Super Mario Bros. Movie", points: 9 },
+                    { text: "Tomb Raider", points: 7 }
+                ]
+            },
+            {
+                question: "NAME A DUNGEONS AND DRAGONS CLASS",
+                answers: [
+                    { text: "Bard", points: 22 },
+                    { text: "Rogue", points: 17 },
+                    { text: "Paladin", points: 11 },
+                    { text: "Druid", points: 9 },
+                    { text: "Cleric", points: 7 },
+                    { text: "Wizard", points: 6 },
+                    { text: "Warlock", points: 5 }
+                ]
+            },
+            {
+                question: "OTHER THAN MARIO, NAME AN ICONIC VIDEO GAME CHARACTER NON-GAMERS WOULD RECOGNIZE",
+                answers: [
+                    { text: "Sonic", points: 25 },
+                    { text: "Link", points: 17 },
+                    { text: "Pikachu", points: 14 },
+                    { text: "Pac-Man", points: 9 },
+                    { text: "Luigi", points: 5 },
+                    { text: "Donkey Kong", points: 4 }
+                ]
+            },
+            {
+                question: "NAME A VIDEO GAME THAT HAS A WEIRD/UNIQUE CURRENCY",
+                answers: [
+                    { text: "Fallout", points: 31 },
+                    { text: "Legend of Zelda", points: 11 },
+                    { text: "Animal Crossing", points: 11 },
+                    { text: "Sims", points: 11 },
+                    { text: "Final Fantasy", points: 10 }
+                ]
+            },
+            {
+                question: "NAME A POPULAR PARTY BOARD GAME",
+                answers: [
+                    { text: "Cards Against Humanity", points: 23 },
+                    { text: "Codenames", points: 17 },
+                    { text: "Werewolf", points: 11 },
+                    { text: "Wavelength", points: 7 },
+                    { text: "What Do You Meme", points: 6 },
+                    { text: "Hues and Cues", points: 5 }
+                ]
+            },
+            {
+                question: "NAME A CLASSIC ARCADE GAME",
+                answers: [
+                    { text: "Pac Man", points: 41 },
+                    { text: "Galaga", points: 12 },
+                    { text: "Street Fighter", points: 8 },
+                    { text: "Centipede", points: 6 },
+                    { text: "Donkey Kong", points: 5 },
+                    { text: "Asteroids", points: 4 }
+                ]
+            },
+            {
+                question: "NAME A POPULAR BOARD GAME",
+                answers: [
+                    { text: "Catan", points: 24 },
+                    { text: "Monopoly", points: 20 },
+                    { text: "Clue", points: 7 },
+                    { text: "Scrabble", points: 7 },
+                    { text: "Ticket to Ride", points: 5 },
+                    { text: "Wingspan", points: 4 },
+                    { text: "Betrayal at House on the Hill", points: 4 }
+                ]
+            },
+            {
+                question: "NAME A POPULAR JACKBOX GAME",
+                answers: [
+                    { text: "Quiplash", points: 32 },
+                    { text: "Trivia Murder Party", points: 18 },
+                    { text: "Tee K.O.", points: 13 },
+                    { text: "Drawful", points: 8 },
+                    { text: "Fibbage", points: 5 },
+                    { text: "You Don't Know Jack", points: 5 }
+                ]
+            },
+            {
+                question: "OTHER THAN FINAL FANTASY, NAME A POPULAR RPG VIDEO GAME SERIES",
+                answers: [
+                    { text: "Baldur's Gate", points: 16 },
+                    { text: "The Elder Scrolls", points: 15 },
+                    { text: "Fallout", points: 12 },
+                    { text: "Dragon Quest", points: 10 },
+                    { text: "Persona", points: 9 },
+                    { text: "Pokémon", points: 9 },
+                    { text: "Kingdom Hearts", points: 7 }
+                ]
+            },
+            {
+                question: "WHO IS THE BEST SUPER SMASH BROS. CHARACTER?",
+                answers: [
+                    { text: "Kirby", points: 33 },
+                    { text: "Link", points: 12 },
+                    { text: "Samus", points: 7 },
+                    { text: "Yoshi", points: 7 },
+                    { text: "Ness", points: 7 },
+                    { text: "Minecraft Steve", points: 6 },
+                    { text: "Pikachu", points: 5 }
+                ]
+            },
+            {
+                question: "IN POKÉMON, WHAT'S YOUR FAVORITE EEVEELUTION?",
+                answers: [
+                    { text: "Umbreon", points: 17 },
+                    { text: "Jolteon", points: 13 },
+                    { text: "Vaporeon", points: 12 },
+                    { text: "Sylveon", points: 12 },
+                    { text: "Flareon", points: 10 },
+                    { text: "Leafeon", points: 8 },
+                    { text: "Espeon", points: 8 }
+                ]
+            },
+            {
+                question: "WHAT'S THE BEST GAME IN THE ZELDA FRANCHISE?",
+                answers: [
+                    { text: "Ocarina of Time", points: 26 },
+                    { text: "Breath of the Wild", points: 19 },
+                    { text: "A Link to the Past", points: 15 },
+                    { text: "The Wind Waker", points: 6 },
+                    { text: "Twilight Princess", points: 6 },
+                    { text: "Majora's Mask", points: 5 }
                 ]
             }
         ];
-
         // Game state
         let gameState = {
             currentQuestionIndex: 0,
