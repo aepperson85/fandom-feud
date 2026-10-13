@@ -210,11 +210,6 @@
         <div class="score-controls desktop-only">
             <div class="score-control-group">
                 <h3>Team 1</h3>
-                <div class="input-group" style="margin-bottom: 10px;">
-                    <label>Team Name:</label>
-                    <input type="text" id="team1NameInput" value="TEAM 1" placeholder="Team 1 Name">
-                    <button class="btn btn-primary" onclick="updateTeamName(1)" style="margin-top: 5px;">Update Name</button>
-                </div>
                 <div class="score-input">
                     <input type="number" id="team1ScoreInput" value="0" min="0">
                     <button class="btn btn-primary" onclick="updateTeamScore(1)">Update Score</button>
@@ -223,11 +218,6 @@
 
             <div class="score-control-group">
                 <h3>Team 2</h3>
-                <div class="input-group" style="margin-bottom: 10px;">
-                    <label>Team Name:</label>
-                    <input type="text" id="team2NameInput" value="TEAM 2" placeholder="Team 2 Name">
-                    <button class="btn btn-primary" onclick="updateTeamName(2)" style="margin-top: 5px;">Update Name</button>
-                </div>
                 <div class="score-input">
                     <input type="number" id="team2ScoreInput" value="0" min="0">
                     <button class="btn btn-primary" onclick="updateTeamScore(2)">Update Score</button>
@@ -424,6 +414,12 @@
             const data = snapshot.val();
             if (data) {
                 gameState = data;
+                // Team names are fixed. Reset any custom name saved earlier.
+                if (gameState.team1.name !== 'TEAM 1' || gameState.team2.name !== 'TEAM 2') {
+                    gameState.team1.name = 'TEAM 1';
+                    gameState.team2.name = 'TEAM 2';
+                    db.ref('gameState').set(gameState);
+                }
                 renderControls();
                 renderQuestionButtons();
             } else if (!firebaseReady) {
@@ -494,9 +490,7 @@
                 answerControls.appendChild(control);
             });
 
-            document.getElementById('team1NameInput').value = gameState.team1.name;
             document.getElementById('team1ScoreInput').value = gameState.team1.score;
-            document.getElementById('team2NameInput').value = gameState.team2.name;
             document.getElementById('team2ScoreInput').value = gameState.team2.score;
 
             document.getElementById('roundPotDisplay').textContent = gameState.roundPot;
@@ -529,14 +523,6 @@
         function updateTeamScore(team) {
             const score = parseInt(document.getElementById(`team${team}ScoreInput`).value) || 0;
             gameState[`team${team}`].score = score;
-            saveToStorage();
-            renderControls();
-        }
-
-        // Update team name
-        function updateTeamName(team) {
-            const name = document.getElementById(`team${team}NameInput`).value.trim().toUpperCase() || `TEAM ${team}`;
-            gameState[`team${team}`].name = name;
             saveToStorage();
             renderControls();
         }
