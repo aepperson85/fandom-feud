@@ -113,6 +113,7 @@
         .btn-success { background: #1e3c72; color: white; border: 2px solid #000000; }
         .btn-danger { background: #8b0000; color: white; border: 2px solid #000000; }
         .btn-warning { background: #0a1628; color: white; border: 2px solid #2a5298; }
+        .bg-btn.active { background: #c026d3; box-shadow: 0 0 0 3px #ffffff; }
         .btn-info { background: #2a5298; color: white; border: 2px solid #000000; }
 
         .control-buttons {
@@ -272,6 +273,16 @@
                 <button class="btn btn-warning" onclick="removeStrike()">Remove Strike</button>
                 <button class="btn btn-info" onclick="clearStrikes()">Clear Strikes</button>
                 <button class="btn btn-danger" onclick="resetAll()">Reset All</button>
+            </div>
+        </div>
+
+        <!-- Display Background -->
+        <div class="score-control-group" style="margin-bottom: 20px;">
+            <h3>Display Background</h3>
+            <p style="color: #ffffff; opacity: 0.8; margin: 10px 0;">Switches the background on every display screen at once.</p>
+            <div class="control-buttons">
+                <button class="btn btn-primary bg-btn" data-mode="video" onclick="setBackground('video')">Branded Video</button>
+                <button class="btn btn-primary bg-btn" data-mode="black" onclick="setBackground('black')">Plain Black</button>
             </div>
         </div>
 
@@ -874,6 +885,17 @@
 
             alert('Question updated successfully!');
         }
+
+        // Display background (video / black) - saved in Firebase so every display follows it
+        function setBackground(mode) {
+            db.ref('settings/background').set(mode);
+        }
+        db.ref('settings/background').on('value', (snapshot) => {
+            const mode = snapshot.val() === 'black' ? 'black' : 'video';
+            document.querySelectorAll('.bg-btn').forEach(b => {
+                b.classList.toggle('active', b.dataset.mode === mode);
+            });
+        });
 
         // Initialize (Firebase listeners above load everything automatically)
         renderQuestionButtons();
