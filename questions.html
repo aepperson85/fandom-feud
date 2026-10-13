@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fandom Feud - Questions</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #0a1628;
+            color: #ffffff;
+            padding: 16px 16px 110px;
+        }
+
+        .wrap { max-width: 760px; margin: 0 auto; }
+
+        h1 { font-size: 1.5em; margin-bottom: 6px; }
+
+        .sub { opacity: 0.8; margin-bottom: 14px; line-height: 1.4; }
+
+        .nav a { color: #ffffff; }
+
+        .status {
+            background: #1e3c72;
+            border: 2px solid #000000;
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin: 12px 0;
+            font-size: 0.95em;
+        }
+
+        .status.good { background: #1d5e2f; }
+        .status.bad { background: #8b0000; font-weight: bold; }
+
+        .filter {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 2px solid #2a5298;
+            background: #ecf0f1;
+            margin-bottom: 12px;
+        }
+
+        .q-card {
+            background: #1e3c72;
+            border: 3px solid #000000;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        .q-card.has-error { border-color: #ff5a5a; }
+
+        .q-head {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px;
+            cursor: pointer;
+        }
+
+        .q-num {
+            flex: 0 0 auto;
+            min-width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .q-title { flex: 1; font-weight: bold; line-height: 1.25; }
+        .q-meta { opacity: 0.7; font-size: 0.85em; white-space: nowrap; }
+
+        .q-body { display: none; padding: 0 14px 14px; }
+        .q-card.open .q-body { display: block; }
+
+        label.lbl { display: block; font-weight: bold; margin: 8px 0 6px; }
+
+        input.txt {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #2a5298;
+            border-radius: 6px;
+            background: #ecf0f1;
+            color: #000000;
+        }
+
+        .a-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+        .a-row .a-num { flex: 0 0 22px; text-align: center; opacity: 0.7; }
+        .a-row input.a-text { flex: 1; min-width: 0; }
+        .a-row input.a-pts { flex: 0 0 76px; text-align: center; }
+
+        .btn {
+            padding: 12px 14px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 8px;
+            border: 2px solid #000000;
+            cursor: pointer;
+            color: #ffffff;
+            background: #2a5298;
+        }
+
+        .btn.danger { background: #8b0000; }
+        .btn.dark { background: #0a1628; border-color: #2a5298; }
+        .btn.green { background: #1d7a3a; }
+        .btn.x { padding: 10px 13px; background: #0a1628; border-color: #2a5298; }
+        .btn:disabled { opacity: 0.4; cursor: default; }
+
+        .row-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+
+        .err { color: #ffb3b3; font-weight: bold; margin: 6px 0; }
+
+        .savebar {
+            position: fixed;
+            left: 0; right: 0; bottom: 0;
+            background: #1e3c72;
+            border-top: 3px solid #000000;
+            padding: 12px 16px;
+            z-index: 10;
+        }
+
+        .savebar-inner {
+            max-width: 760px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .savebar .msg { flex: 1; font-size: 0.95em; }
+        .savebar .btn { padding: 14px 22px; font-size: 17px; }
+
+        .tools { margin-top: 26px; padding-top: 16px; border-top: 2px solid #2a5298; }
+        .tools h2 { font-size: 1.05em; margin-bottom: 8px; }
+        .tools p { opacity: 0.8; margin-bottom: 10px; line-height: 1.4; font-size: 0.95em; }
+
+        textarea.export {
+            width: 100%;
+            height: 180px;
+            font-family: monospace;
+            font-size: 13px;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <h1>Fandom Feud Questions</h1>
+    <p class="sub nav">Tap a question to edit it. When you are done, press <b>Save</b> at the bottom. The control panel picks up the new list right away. <a href="control.html">Back to control panel</a></p>
+
+    <div class="status" id="sourceStatus">Loading...</div>
+    <div class="status bad" id="problemBox" style="display:none;"></div>
+
+    <input class="filter" id="filter" type="search" placeholder="Search questions...">
+
+    <div id="list"></div>
+
+    <button class="btn green" style="width:100%; margin-top:6px;" onclick="addQuestion()">+ Add a new question</button>
+
+    <div class="tools">
+        <h2>Backup and reset</h2>
+        <p>Your saved list lives online. If you ever want a copy for GitHub, press the first button, copy the text and paste it into <b>questions.js</b>.</p>
+        <div class="row-actions">
+            <button class="btn dark" onclick="showExport()">Show list as questions.js text</button>
+            <button class="btn danger" onclick="resetToFile()">Start over from questions.js</button>
+        </div>
+        <textarea class="export" id="exportBox" readonly></textarea>
+    </div>
+</div>
+
+<div class="savebar">
+    <div class="savebar-inner">
+        <div class="msg" id="saveMsg">No changes yet</div>
+        <button class="btn green" id="saveBtn" onclick="saveAll()" disabled>Save</button>
+    </div>
+</div>
+
+<script src="backgrounds.js"></script>
+<script src="questions.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<script>
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDHCUOL96pVa4F44OeOX5j6tgAm739XGeM",
+      authDomain: "fandom-feud.firebaseapp.com",
+      databaseURL: "https://fandom-feud-default-rtdb.firebaseio.com",
+      projectId: "fandom-feud",
+      storageBucket: "fandom-feud.firebasestorage.app",
+      messagingSenderId: "355989427943",
+      appId: "1:355989427943:web:6573493a3d273d326cf442"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // The working list. Each question: { question, answers: [{text, points}], open }
+    let list = [];
+    let dirty = false;
+    let source = 'file';
+    let loaded = false;
+
+    function toList(raw) {
+        if (raw && !Array.isArray(raw) && typeof raw === 'object') raw = Object.values(raw);
+        if (!Array.isArray(raw)) return [];
+        return raw.map(q => {
+            let answers = q && q.answers;
+            if (answers && !Array.isArray(answers) && typeof answers === 'object') answers = Object.values(answers);
+            answers = Array.isArray(answers) ? answers : [];
+            return {
+                question: (q && typeof q.question === 'string') ? q.question : '',
+                answers: answers.map(a => Array.isArray(a)
+                    ? { text: String(a[0] == null ? '' : a[0]), points: String(a[1] == null ? '' : a[1]) }
+                    : { text: String(a && a.text != null ? a.text : ''), points: String(a && a.points != null ? a.points : '') }),
+                open: false
+            };
+        });
+    }
+
+    function setSourceStatus() {
+        const el = document.getElementById('sourceStatus');
+        el.textContent = source === 'online'
+            ? 'Showing your saved list (' + list.length + ' questions).'
+            : 'Showing the starting list from questions.js (' + list.length + ' questions). Nothing has been saved online yet. Your first Save makes this page the one that controls the questions.';
+    }
+
+    function markDirty(on) {
+        dirty = on;
+        document.getElementById('saveBtn').disabled = !on;
+        document.getElementById('saveMsg').textContent = on ? 'You have unsaved changes' : 'All changes saved';
+    }
+
+    // ---- validation ----
+    function validate() {
+        const problems = [];
+        list.forEach((q, i) => {
+            const n = i + 1;
+            q._err = [];
+            if (!q.question.trim()) q._err.push('Question text is empty.');
+            if (q.answers.length === 0) q._err.push('Add at least one answer.');
+            q.answers.forEach((a, j) => {
+                if (!a.text.trim()) q._err.push('Answer ' + (j + 1) + ' is empty.');
+                const p = a.points.trim();
+                if (p === '' || !isFinite(Number(p))) q._err.push('Answer ' + (j + 1) + ' needs a number for points.');
+            });
+            q._err.forEach(e => problems.push('Question ' + n + ': ' + e));
+        });
+        return problems;
+    }
+
+    // ---- rendering ----
+    function el(tag, attrs, kids) {
+        const e = document.createElement(tag);
+        Object.entries(attrs || {}).forEach(([k, v]) => {
+            if (k === 'class') e.className = v;
+            else if (k === 'text') e.textContent = v;
+            else if (k.startsWith('on')) e.addEventListener(k.slice(2), v);
+            else e.setAttribute(k, v);
+        });
+        (kids || []).forEach(c => e.appendChild(c));
+        return e;
+    }
+
+    function render() {
+        const box = document.getElementById('list');
+        const term = document.getElementById('filter').value.trim().toLowerCase();
+        box.innerHTML = '';
+        list.forEach((q, i) => {
+            const hay = (q.question + ' ' + q.answers.map(a => a.text).join(' ')).toLowerCase();
+            if (term && !hay.includes(term)) return;
+
+            const card = el('div', { class: 'q-card' + (q.open ? ' open' : '') + (q._err && q._err.length ? ' has-error' : '') });
+            const head = el('div', { class: 'q-head', onclick: () => { q.open = !q.open; render(); } }, [
+                el('div', { class: 'q-num', text: String(i + 1) }),
+                el('div', { class: 'q-title', text: q.question.trim() || '(new question)' }),
+                el('div', { class: 'q-meta', text: q.answers.length + ' answers' })
+            ]);
+            card.appendChild(head);
+
+            const body = el('div', { class: 'q-body' });
+            body.appendChild(el('label', { class: 'lbl', text: 'Question' }));
+            const qi = el('input', { class: 'txt', type: 'text', value: q.question, placeholder: 'Type the question' });
+            qi.addEventListener('input', () => { q.question = qi.value; markDirty(true); });
+            body.appendChild(qi);
+
+            body.appendChild(el('label', { class: 'lbl', text: 'Answers (best answer first) and points' }));
+            q.answers.forEach((a, j) => {
+                const ti = el('input', { class: 'txt a-text', type: 'text', value: a.text, placeholder: 'Answer' });
+                ti.addEventListener('input', () => { a.text = ti.value; markDirty(true); });
+                const pi = el('input', { class: 'txt a-pts', type: 'text', inputmode: 'numeric', value: a.points, placeholder: 'Pts' });
+                pi.addEventListener('input', () => { a.points = pi.value; markDirty(true); });
+                const rm = el('button', { class: 'btn x', title: 'Remove this answer', text: 'X', onclick: () => {
+                    q.answers.splice(j, 1); markDirty(true); render();
+                } });
+                body.appendChild(el('div', { class: 'a-row' }, [el('div', { class: 'a-num', text: String(j + 1) }), ti, pi, rm]));
+            });
+
+            if (q._err && q._err.length) {
+                q._err.forEach(e => body.appendChild(el('div', { class: 'err', text: e })));
+            }
+            if (q.answers.length > 8) {
+                body.appendChild(el('div', { class: 'err', text: 'More than 8 answers may not fit on screen.' }));
+            }
+
+            const actions = el('div', { class: 'row-actions' }, [
+                el('button', { class: 'btn dark', text: '+ Add answer', onclick: () => {
+                    q.answers.push({ text: '', points: '' }); markDirty(true); render();
+                } }),
+                el('button', { class: 'btn dark', text: 'Move up', onclick: () => move(i, -1) }),
+                el('button', { class: 'btn dark', text: 'Move down', onclick: () => move(i, 1) }),
+                el('button', { class: 'btn danger', text: 'Delete question', onclick: () => {
+                    if (confirm('Delete question ' + (i + 1) + '?')) { list.splice(i, 1); markDirty(true); render(); }
+                } })
+            ]);
+            body.appendChild(actions);
+            card.appendChild(body);
+            box.appendChild(card);
+        });
+        if (!box.children.length) {
+            box.appendChild(el('div', { class: 'status', text: term ? 'No questions match your search.' : 'No questions yet. Add one below.' }));
+        }
+        setSourceStatus();
+    }
+
+    function move(i, dir) {
+        const k = i + dir;
+        if (k < 0 || k >= list.length) return;
+        const t = list[i]; list[i] = list[k]; list[k] = t;
+        markDirty(true);
+        render();
+    }
+
+    function addQuestion() {
+        list.push({ question: '', answers: [{ text: '', points: '' }, { text: '', points: '' }, { text: '', points: '' }], open: true });
+        document.getElementById('filter').value = '';
+        markDirty(true);
+        render();
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    // ---- saving ----
+    function saveAll() {
+        const problems = validate();
+        const pb = document.getElementById('problemBox');
+        if (problems.length) {
+            list.forEach(q => { if (q._err && q._err.length) q.open = true; });
+            pb.innerHTML = 'Please fix these before saving:<br>' + problems.slice(0, 8).map(p => '- ' + p).join('<br>') + (problems.length > 8 ? '<br>...and ' + (problems.length - 8) + ' more' : '');
+            pb.style.display = 'block';
+            render();
+            window.scrollTo(0, 0);
+            return;
+        }
+        pb.style.display = 'none';
+        list.forEach(q => { q._err = []; });
+        const clean = list.map(q => ({
+            question: q.question.trim(),
+            answers: q.answers.map(a => ({ text: a.text.trim(), points: Number(a.points) }))
+        }));
+        document.getElementById('saveMsg').textContent = 'Saving...';
+        db.ref('questions').set(clean).then(() => {
+            source = 'online';
+            markDirty(false);
+            document.getElementById('saveMsg').textContent = 'Saved. The control panel has the new list.';
+            render();
+        }).catch(err => {
+            document.getElementById('saveMsg').textContent = 'Could not save. Check your internet and try again.';
+        });
+    }
+
+    // ---- backup / reset ----
+    function showExport() {
+        const problems = validate();
+        if (problems.length) { alert('Fix the problems first (' + problems[0] + ') and then try again.'); render(); return; }
+        let out = 'window.QUESTIONS = [\n';
+        out += list.map(q => {
+            const answers = q.answers.map(a => '      [' + JSON.stringify(a.text.trim()) + ', ' + Number(a.points) + ']').join(',\n');
+            return '  {\n    question: ' + JSON.stringify(q.question.trim()) + ',\n    answers: [\n' + answers + '\n    ]\n  }';
+        }).join(',\n');
+        out += '\n];\n';
+        const box = document.getElementById('exportBox');
+        box.value = out;
+        box.style.display = 'block';
+        box.focus();
+        box.select();
+    }
+
+    function resetToFile() {
+        if (!confirm('This throws away the saved online list and goes back to the questions in questions.js. Continue?')) return;
+        db.ref('questions').remove().then(() => {
+            list = toList(window.QUESTIONS);
+            source = 'file';
+            markDirty(false);
+            document.getElementById('saveMsg').textContent = 'Back to questions.js';
+            render();
+        });
+    }
+
+    // ---- start up ----
+    document.getElementById('filter').addEventListener('input', render);
+    window.addEventListener('beforeunload', (e) => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+
+    db.ref('questions').once('value').then((snap) => {
+        const data = snap.val();
+        if (data) { list = toList(data); source = 'online'; }
+        else { list = toList(window.QUESTIONS); source = 'file'; }
+        loaded = true;
+        render();
+        document.getElementById('saveMsg').textContent = 'No changes yet';
+    }).catch(() => {
+        document.getElementById('sourceStatus').textContent = 'Could not reach the online database. Check your internet and reload.';
+        document.getElementById('sourceStatus').className = 'status bad';
+    });
+</script>
+</body>
+</html>
