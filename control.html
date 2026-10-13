@@ -277,7 +277,6 @@
     </div>
 
     <script src="backgrounds.js"></script>
-    <script src="questions.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     <script>
@@ -295,8 +294,7 @@
         const db = firebase.database();
         let firebaseReady = false;
 
-        // Questions: the live list comes from the Questions page (saved online).
-        // If nothing has been saved there, it falls back to questions.js in the repo.
+        // Questions: the one and only list is saved online and edited on the Questions page.
         let questionBank = [];
         let questionProblems = [];
         let questionSource = 'file';
@@ -305,10 +303,10 @@
             questionBank = [];
             questionProblems = [];
             questionSource = source;
-            const where = source === 'online' ? 'the Questions page' : 'questions.js';
+            const where = 'the Questions page';
             if (raw && !Array.isArray(raw) && typeof raw === 'object') raw = Object.values(raw);
             if (!Array.isArray(raw)) {
-                questionProblems.push('The question list did not load. If you are using questions.js, check that it is in the repo next to control.html and has no typos (a missing comma or quote mark).');
+                questionProblems.push('No questions yet. Open the Questions page (link under the dropdown), add your questions and press Save.');
             } else {
                 raw.forEach((q, i) => {
                     const n = i + 1;
@@ -342,9 +340,7 @@
                 });
             }
             const src = document.getElementById('questionSource');
-            if (src) src.textContent = source === 'online'
-                ? 'Question list: edited on the Questions page'
-                : 'Question list: questions.js file';
+            if (src) src.textContent = questionBank.length + ' questions (edit them on the Questions page)';
             const w = document.getElementById('questionWarning');
             if (w) {
                 if (questionProblems.length) {
@@ -367,12 +363,8 @@
             roundPot: 0
         };
 
-        applyQuestions(window.QUESTIONS, 'file');
-
         db.ref('questions').on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (data) applyQuestions(data, 'online');
-            else applyQuestions(window.QUESTIONS, 'file');
+            applyQuestions(snapshot.val(), 'online');
         });
 
         // Audio context for sound effects
