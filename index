@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fandom Feud</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dosis&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { background: #0a1628; }
+
+        body {
+            font-family: 'Dosis', Arial, sans-serif;
+            background: linear-gradient(180deg, #0a1628 0%, #1e3c72 100%);
+            background-attachment: fixed;
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 32px 16px 48px;
+        }
+
+        .wrap { max-width: 640px; margin: 0 auto; }
+
+        h1 {
+            font-size: 2.8em;
+            text-transform: uppercase;
+            text-align: center;
+            letter-spacing: 0.04em;
+            font-weight: 400;
+        }
+
+        .tag {
+            text-align: center;
+            text-transform: uppercase;
+            opacity: 0.8;
+            font-size: 1.2em;
+            margin: 4px 0 28px;
+        }
+
+        h2 {
+            font-size: 1.1em;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 400;
+            opacity: 0.75;
+            margin: 26px 0 10px;
+        }
+
+        .card {
+            display: block;
+            text-decoration: none;
+            color: #ffffff;
+            background: #2a5298;
+            border: 3px solid #000000;
+            border-radius: 14px;
+            padding: 18px 20px;
+            margin-bottom: 12px;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .card:hover, .card:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+            outline: none;
+        }
+
+        .card.display { background: linear-gradient(135deg, #a020c0 0%, #c026d3 100%); }
+
+        .card .name { font-size: 1.6em; text-transform: uppercase; line-height: 1.1; }
+        .card .desc { font-size: 1.15em; opacity: 0.9; margin-top: 4px; line-height: 1.25; }
+        .card .arrow { float: right; font-size: 1.4em; opacity: 0.8; }
+
+        .foot { text-align: center; opacity: 0.6; margin-top: 30px; font-size: 1em; }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <h1>Fandom Feud</h1>
+    <div class="tag">Game night control center</div>
+
+    <h2>Run the game</h2>
+    <a class="card" href="control.html" target="_blank" rel="noopener">
+        <span class="arrow">&#8599;</span>
+        <div class="name">Control Panel</div>
+        <div class="desc">Pick questions, reveal answers, add strikes, award points. Open this on your phone.</div>
+    </a>
+
+    <h2>Put on the big screen</h2>
+    <a class="card display" href="display.html" target="_blank" rel="noopener">
+        <span class="arrow">&#8599;</span>
+        <div class="name">Game Display</div>
+        <div class="desc">Centered layout for a TV or projector. Use this one at conventions.</div>
+    </a>
+    <a class="card display" href="streaming.html" target="_blank" rel="noopener">
+        <span class="arrow">&#8599;</span>
+        <div class="name">Streaming Display</div>
+        <div class="desc">Leaves room for the live camera on the left. Use this one for Mall of America.</div>
+    </a>
+
+    <h2>Get ready</h2>
+    <a class="card" href="questions.html" target="_blank" rel="noopener">
+        <span class="arrow">&#8599;</span>
+        <div class="name">Questions</div>
+        <div class="desc">Add or change questions and answers. No code needed.</div>
+    </a>
+
+    <div class="foot">Every page opens in a new window and stays in sync with the control panel.</div>
+</div>
+</body>
+</html>
