@@ -113,7 +113,6 @@
         .btn-success { background: #1e3c72; color: white; border: 2px solid #000000; }
         .btn-danger { background: #8b0000; color: white; border: 2px solid #000000; }
         .btn-warning { background: #0a1628; color: white; border: 2px solid #2a5298; }
-        .bg-btn.active { background: #c026d3; box-shadow: 0 0 0 3px #ffffff; }
         .btn-info { background: #2a5298; color: white; border: 2px solid #000000; }
 
         .control-buttons {
@@ -279,11 +278,8 @@
         <!-- Display Background -->
         <div class="score-control-group" style="margin-bottom: 20px;">
             <h3>Display Background</h3>
-            <p style="color: #ffffff; opacity: 0.8; margin: 10px 0;">Switches the background on every display screen at once.</p>
-            <div class="control-buttons">
-                <button class="btn btn-primary bg-btn" data-mode="video" onclick="setBackground('video')">Branded Video</button>
-                <button class="btn btn-primary bg-btn" data-mode="black" onclick="setBackground('black')">Plain Black</button>
-            </div>
+            <p style="color: #ffffff; opacity: 0.8; margin: 10px 0;">Changes the background on every display screen at once.</p>
+            <select id="backgroundSelect" onchange="setBackground(this.value)" style="width: 100%; padding: 14px; font-size: 16px; border-radius: 8px; border: 2px solid #000000; background: #0a1628; color: #ffffff;"></select>
         </div>
 
         <!-- Answer Controls -->
@@ -295,6 +291,7 @@
         </div>
     </div>
 
+    <script src="backgrounds.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     <script>
@@ -886,15 +883,22 @@
             alert('Question updated successfully!');
         }
 
-        // Display background (video / black) - saved in Firebase so every display follows it
-        function setBackground(mode) {
-            db.ref('settings/background').set(mode);
+        // Display background - options come from backgrounds.js, choice is saved in Firebase
+        const BACKGROUNDS = window.BACKGROUNDS || [{ id: 'black', label: 'Plain Black' }];
+        const DEFAULT_BACKGROUND = window.DEFAULT_BACKGROUND || BACKGROUNDS[0].id;
+        const backgroundSelect = document.getElementById('backgroundSelect');
+        BACKGROUNDS.forEach(b => {
+            const o = document.createElement('option');
+            o.value = b.id;
+            o.textContent = b.label;
+            backgroundSelect.appendChild(o);
+        });
+        function setBackground(id) {
+            db.ref('settings/background').set(id);
         }
         db.ref('settings/background').on('value', (snapshot) => {
-            const mode = snapshot.val() === 'black' ? 'black' : 'video';
-            document.querySelectorAll('.bg-btn').forEach(b => {
-                b.classList.toggle('active', b.dataset.mode === mode);
-            });
+            const id = snapshot.val();
+            backgroundSelect.value = BACKGROUNDS.some(b => b.id === id) ? id : DEFAULT_BACKGROUND;
         });
 
         // Initialize (Firebase listeners above load everything automatically)
