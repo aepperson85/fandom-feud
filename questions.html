@@ -169,13 +169,13 @@
     <button class="btn green" style="width:100%; margin-top:6px;" onclick="addQuestion()">+ Add a new question</button>
 
     <div class="tools">
-        <h2>Backup and reset</h2>
-        <p>Your saved list lives online. If you ever want a copy for GitHub, press the first button, copy the text and paste it into <b>questions.js</b>.</p>
+        <h2>Backup</h2>
+        <p>The live list is saved online and is the only copy the game uses. Download a backup file now and then. If the list is ever lost or messed up, <b>Restore from a backup file</b> brings it back (then press Save).</p>
         <div class="row-actions">
-            <button class="btn dark" onclick="showExport()">Show list as questions.js text</button>
-            <button class="btn danger" onclick="resetToFile()">Start over from questions.js</button>
+            <button class="btn dark" onclick="downloadBackup()">Download backup file</button>
+            <button class="btn dark" onclick="document.getElementById('restoreFile').click()">Restore from a backup file</button>
+            <input type="file" id="restoreFile" accept=".json,application/json" style="display:none;">
         </div>
-        <textarea class="export" id="exportBox" readonly></textarea>
     </div>
 </div>
 
@@ -187,7 +187,6 @@
 </div>
 
 <script src="backgrounds.js"></script>
-<script src="questions.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
 <script>
@@ -207,7 +206,7 @@
     // The working list. Each question: { question, answers: [{text, points}], open }
     let list = [];
     let dirty = false;
-    let source = 'file';
+    let source = 'none';
     let loaded = false;
 
     function toList(raw) {
@@ -229,9 +228,13 @@
 
     function setSourceStatus() {
         const el = document.getElementById('sourceStatus');
-        el.textContent = source === 'online'
-            ? 'Showing your saved list (' + list.length + ' questions).'
-            : 'Showing the starting list from questions.js (' + list.length + ' questions). Nothing has been saved online yet. Your first Save makes this page the one that controls the questions.';
+        if (source === 'online') {
+            el.textContent = 'Showing your saved list (' + list.length + ' questions).';
+        } else if (source === 'import') {
+            el.textContent = 'First time setup: these ' + list.length + ' starting questions were found. Press Save to make this the live list.';
+        } else {
+            el.textContent = 'No questions saved yet. Add your first question below, then press Save.';
+        }
     }
 
     function markDirty(on) {
@@ -377,45 +380,73 @@
         });
     }
 
-    // ---- backup / reset ----
-    function showExport() {
+    // ---- backup / restore ----
+    function downloadBackup() {
         const problems = validate();
         if (problems.length) { alert('Fix the problems first (' + problems[0] + ') and then try again.'); render(); return; }
-        let out = 'window.QUESTIONS = [\n';
-        out += list.map(q => {
-            const answers = q.answers.map(a => '      [' + JSON.stringify(a.text.trim()) + ', ' + Number(a.points) + ']').join(',\n');
-            return '  {\n    question: ' + JSON.stringify(q.question.trim()) + ',\n    answers: [\n' + answers + '\n    ]\n  }';
-        }).join(',\n');
-        out += '\n];\n';
-        const box = document.getElementById('exportBox');
-        box.value = out;
-        box.style.display = 'block';
-        box.focus();
-        box.select();
+        const clean = list.map(q => ({
+            question: q.question.trim(),
+            answers: q.answers.map(a => ({ text: a.text.trim(), points: Number(a.points) }))
+        }));
+        const blob = new Blob([JSON.stringify(clean, null, 2)], { type: 'application/json' });
+        const link = document.createElement('a');
+        const d = new Date();
+        const stamp = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'fandom-feud-questions-' + stamp + '.json';
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
     }
 
-    function resetToFile() {
-        if (!confirm('This throws away the saved online list and goes back to the questions in questions.js. Continue?')) return;
-        db.ref('questions').remove().then(() => {
-            list = toList(window.QUESTIONS);
-            source = 'file';
-            markDirty(false);
-            document.getElementById('saveMsg').textContent = 'Back to questions.js';
-            render();
-        });
-    }
+    document.getElementById('restoreFile').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+            try {
+                const restored = toList(JSON.parse(reader.result));
+                if (!restored.length) throw new Error('empty');
+                if (!confirm('Replace what is on this page with the ' + restored.length + ' questions from the backup? Nothing changes for the game until you press Save.')) return;
+                list = restored;
+                markDirty(true);
+                render();
+            } catch (err) {
+                alert('That file is not a Fandom Feud backup.');
+            }
+        };
+        reader.readAsText(file);
+        e.target.value = '';
+    });
 
     // ---- start up ----
     document.getElementById('filter').addEventListener('input', render);
     window.addEventListener('beforeunload', (e) => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
 
-    db.ref('questions').once('value').then((snap) => {
-        const data = snap.val();
-        if (data) { list = toList(data); source = 'online'; }
-        else { list = toList(window.QUESTIONS); source = 'file'; }
+    function finishLoad() {
         loaded = true;
         render();
-        document.getElementById('saveMsg').textContent = 'No changes yet';
+        document.getElementById('saveMsg').textContent = (source === 'import') ? 'Press Save to finish setup' : 'No changes yet';
+        document.getElementById('saveBtn').disabled = (source !== 'import');
+    }
+
+    db.ref('questions').once('value').then((snap) => {
+        const data = snap.val();
+        if (data) {
+            list = toList(data); source = 'online';
+            finishLoad();
+        } else {
+            // First time only: pull in the old questions.js if it is still in the repo
+            const sc = document.createElement('script');
+            sc.src = 'questions.js';
+            sc.onload = () => {
+                list = toList(window.QUESTIONS);
+                source = list.length ? 'import' : 'none';
+                finishLoad();
+            };
+            sc.onerror = () => { list = []; source = 'none'; finishLoad(); };
+            document.head.appendChild(sc);
+        }
     }).catch(() => {
         document.getElementById('sourceStatus').textContent = 'Could not reach the online database. Check your internet and reload.';
         document.getElementById('sourceStatus').className = 'status bad';
