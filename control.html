@@ -202,6 +202,8 @@
             <select id="questionSelect" onchange="loadQuestion(parseInt(this.value))" style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #2a5298; font-size: 1.1em;">
                 <!-- Options generated here -->
             </select>
+            <div id="questionSource" style="color:#ffffff; opacity:0.7; font-size:0.85em; margin-top:8px;"></div>
+            <a href="questions.html" style="display:block; color:#ffffff; margin-top:8px; font-size:0.95em;">Edit questions</a>
         </div>
 
         <!-- Score Controls -->
@@ -293,44 +295,67 @@
         const db = firebase.database();
         let firebaseReady = false;
 
-        // Questions come from questions.js (edit that file to add or change questions)
+        // Questions: the live list comes from the Questions page (saved online).
+        // If nothing has been saved there, it falls back to questions.js in the repo.
         let questionBank = [];
         let questionProblems = [];
-        (function loadQuestionsFromFile() {
-            const raw = window.QUESTIONS;
+        let questionSource = 'file';
+
+        function applyQuestions(raw, source) {
+            questionBank = [];
+            questionProblems = [];
+            questionSource = source;
+            const where = source === 'online' ? 'the Questions page' : 'questions.js';
+            if (raw && !Array.isArray(raw) && typeof raw === 'object') raw = Object.values(raw);
             if (!Array.isArray(raw)) {
-                questionProblems.push('questions.js did not load. Check that the file is in the repo next to control.html, and that it has no typos (a missing comma or quote mark).');
-                return;
-            }
-            raw.forEach((q, i) => {
-                const n = i + 1;
-                if (!q || typeof q.question !== 'string' || !q.question.trim()) {
-                    questionProblems.push('Question ' + n + ' has no question text, so it was skipped.');
-                    return;
-                }
-                if (!Array.isArray(q.answers) || q.answers.length === 0) {
-                    questionProblems.push('Question ' + n + ' has no answers, so it was skipped.');
-                    return;
-                }
-                const answers = [];
-                let bad = false;
-                q.answers.forEach((a, j) => {
-                    const text = Array.isArray(a) ? a[0] : null;
-                    const points = Array.isArray(a) ? Number(a[1]) : NaN;
-                    if (typeof text !== 'string' || !text.trim() || !isFinite(points)) {
-                        questionProblems.push('Question ' + n + ', answer ' + (j + 1) + ' should look like ["Text", 10], so the question was skipped.');
-                        bad = true;
-                    } else {
-                        answers.push({ text: text.trim(), points: points });
+                questionProblems.push('The question list did not load. If you are using questions.js, check that it is in the repo next to control.html and has no typos (a missing comma or quote mark).');
+            } else {
+                raw.forEach((q, i) => {
+                    const n = i + 1;
+                    if (!q || typeof q.question !== 'string' || !q.question.trim()) {
+                        questionProblems.push('Question ' + n + ' has no question text, so it was skipped.');
+                        return;
                     }
+                    let list = q.answers;
+                    if (list && !Array.isArray(list) && typeof list === 'object') list = Object.values(list);
+                    if (!Array.isArray(list) || list.length === 0) {
+                        questionProblems.push('Question ' + n + ' has no answers, so it was skipped.');
+                        return;
+                    }
+                    const answers = [];
+                    let bad = false;
+                    list.forEach((a, j) => {
+                        const text = Array.isArray(a) ? a[0] : (a ? a.text : null);
+                        const points = Array.isArray(a) ? Number(a[1]) : (a ? Number(a.points) : NaN);
+                        if (typeof text !== 'string' || !text.trim() || !isFinite(points)) {
+                            questionProblems.push('Question ' + n + ', answer ' + (j + 1) + ' is missing its text or points, so the question was skipped.');
+                            bad = true;
+                        } else {
+                            answers.push({ text: text.trim(), points: points });
+                        }
+                    });
+                    if (bad) return;
+                    if (answers.length > 8) {
+                        questionProblems.push('Question ' + n + ' has ' + answers.length + ' answers. Screens fit up to about 8 comfortably.');
+                    }
+                    questionBank.push({ n: n, question: q.question.trim(), answers: answers });
                 });
-                if (bad) return;
-                if (answers.length > 8) {
-                    questionProblems.push('Question ' + n + ' has ' + answers.length + ' answers. Screens fit up to about 8 comfortably.');
+            }
+            const src = document.getElementById('questionSource');
+            if (src) src.textContent = source === 'online'
+                ? 'Question list: edited on the Questions page'
+                : 'Question list: questions.js file';
+            const w = document.getElementById('questionWarning');
+            if (w) {
+                if (questionProblems.length) {
+                    w.innerHTML = 'Fix needed in ' + where + ':<br>' + questionProblems.map(p => '- ' + p).join('<br>');
+                    w.style.display = 'block';
+                } else {
+                    w.style.display = 'none';
                 }
-                questionBank.push({ n: n, question: q.question.trim(), answers: answers });
-            });
-        })();
+            }
+            if (typeof renderQuestionButtons === 'function' && document.getElementById('questionSelect')) renderQuestionButtons();
+        }
         // Game state
         let gameState = {
             currentQuestionIndex: 0,
@@ -341,6 +366,14 @@
             strikes: 0,
             roundPot: 0
         };
+
+        applyQuestions(window.QUESTIONS, 'file');
+
+        db.ref('questions').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) applyQuestions(data, 'online');
+            else applyQuestions(window.QUESTIONS, 'file');
+        });
 
         // Audio context for sound effects
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -583,11 +616,6 @@
 
         // Initialize (Firebase listeners above load everything automatically)
         renderQuestionButtons();
-        if (questionProblems.length) {
-            const w = document.getElementById('questionWarning');
-            w.innerHTML = 'Fix needed in questions.js:<br>' + questionProblems.map(p => '- ' + p).join('<br>');
-            w.style.display = 'block';
-        }
 
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
