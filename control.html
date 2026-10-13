@@ -194,31 +194,14 @@
 <body>
     <div class="control-panel" id="controlPanel">
 
+        <div id="questionWarning" style="display:none; background:#8b0000; color:#ffffff; border:3px solid #000000; border-radius:10px; padding:15px; margin-bottom:20px; font-weight:bold;"></div>
+
         <!-- Question Bank -->
         <div class="question-bank">
             <h2>Current Question</h2>
             <select id="questionSelect" onchange="loadQuestion(parseInt(this.value))" style="width: 100%; padding: 12px; border-radius: 8px; border: 2px solid #2a5298; font-size: 1.1em;">
                 <!-- Options generated here -->
             </select>
-        </div>
-
-        <!-- Question Editor -->
-        <div class="score-control-group desktop-only" style="margin-bottom: 20px;">
-            <h3>Edit Current Question</h3>
-            <div class="input-group">
-                <label>Question Text:</label>
-                <input type="text" id="editQuestion" placeholder="Enter question text">
-            </div>
-            <div class="input-group" style="margin-top: 10px;">
-                <label>Answers (one per line, format: "Answer, Points"):</label>
-                <textarea id="editAnswers" rows="8" placeholder="Answer 1, 45&#10;Answer 2, 30&#10;Answer 3, 15&#10;Answer 4, 7&#10;Answer 5, 3"></textarea>
-            </div>
-            <button class="btn btn-primary" onclick="updateCurrentQuestion()" style="width: 100%; margin-top: 10px;">
-                Update Current Question
-            </button>
-            <button class="btn btn-warning" onclick="loadQuestionIntoEditor()" style="width: 100%; margin-top: 10px;">
-                Load Current Question Into Editor
-            </button>
         </div>
 
         <!-- Score Controls -->
@@ -292,6 +275,7 @@
     </div>
 
     <script src="backgrounds.js"></script>
+    <script src="questions.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     <script>
@@ -309,285 +293,44 @@
         const db = firebase.database();
         let firebaseReady = false;
 
-        // Question Bank - 12 pre-loaded questions (Sci-Fi & Paranormal Edition)
-         let questionBank = [
-            {
-                question: "WHO IS THE BEST MARIO KART CHARACTER?",
-                answers: [
-                    { text: "Yoshi", points: 23 },
-                    { text: "Toad", points: 12 },
-                    { text: "Rosalina", points: 8 },
-                    { text: "Peach", points: 7 },
-                    { text: "Luigi", points: 5 },
-                    { text: "Wario", points: 5 },
-                    { text: "Mario", points: 4 }
-                ]
-            },
-            {
-                question: "NAME A POPULAR TRADING CARD GAME (TCG)",
-                answers: [
-                    { text: "Magic: The Gathering", points: 39 },
-                    { text: "Pokémon TCG", points: 30 },
-                    { text: "Yu-Gi-Oh!", points: 7 },
-                    { text: "One Piece Card Game", points: 4 },
-                    { text: "Lorcana", points: 3 },
-                    { text: "Star Wars Unlimited", points: 2 }
-                ]
-            },
-            {
-                question: "NAME A DUNGEONS AND DRAGONS MONSTER",
-                answers: [
-                    { text: "Beholder", points: 30 },
-                    { text: "Mimic", points: 13 },
-                    { text: "Gelatinous Cube", points: 11 },
-                    { text: "Dragon", points: 5 },
-                    { text: "Displacer Beast", points: 4 },
-                    { text: "Owlbear", points: 4 },
-                    { text: "Goblin", points: 3 }
-                ]
-            },
-            {
-                question: "NAME A TYPE OF POKÉMON",
-                answers: [
-                    { text: "Fire", points: 16 },
-                    { text: "Water", points: 13 },
-                    { text: "Fairy", points: 11 },
-                    { text: "Ghost", points: 11 },
-                    { text: "Grass", points: 9 },
-                    { text: "Electric", points: 6 },
-                    { text: "Psychic", points: 4 }
-                ]
-            },
-            {
-                question: "NAME A BOARD GAME THAT THE EXPANSION IS A MUST HAVE",
-                answers: [
-                    { text: "Cards Against Humanity", points: 19 },
-                    { text: "Catan", points: 15 },
-                    { text: "Dominion", points: 12 },
-                    { text: "Red Dragon Inn", points: 10 },
-                    { text: "Ticket to Ride", points: 10 },
-                    { text: "Wingspan", points: 9 }
-                ]
-            },
-            {
-                question: "WHAT CONSOLE HAS THE WORST CONTROLLER?",
-                answers: [
-                    { text: "Nintendo 64", points: 28 },
-                    { text: "Xbox Original", points: 10 },
-                    { text: "Atari", points: 9 },
-                    { text: "Nintendo Wii", points: 8 },
-                    { text: "Nintendo Switch", points: 8 },
-                    { text: "PlayStation Original", points: 6 },
-                    { text: "GameCube", points: 5 }
-                ]
-            },
-            {
-                question: "IN THE MARIO FRANCHISE, WHAT'S THE BEST GAME?",
-                answers: [
-                    { text: "Super Mario Galaxy", points: 17 },
-                    { text: "Super Mario Bros. 3", points: 14 },
-                    { text: "Super Mario World", points: 10 },
-                    { text: "Super Mario 64", points: 9 },
-                    { text: "Super Mario Odyssey", points: 8 },
-                    { text: "Super Mario Sunshine", points: 7 }
-                ]
-            },
-            {
-                question: "NAME A GAME THAT USES A STANDARD DECK OF CARDS",
-                answers: [
-                    { text: "Poker", points: 19 },
-                    { text: "Cribbage", points: 12 },
-                    { text: "Solitaire", points: 10 },
-                    { text: "War", points: 7 },
-                    { text: "Go Fish", points: 5 },
-                    { text: "Hearts", points: 5 },
-                    { text: "Gin / Rummy", points: 4 }
-                ]
-            },
-            {
-                question: "NAME A POPULAR \"RETRO\" CONSOLE",
-                answers: [
-                    { text: "Super Nintendo Entertainment System", points: 19 },
-                    { text: "Atari", points: 16 },
-                    { text: "Nintendo 64", points: 14 },
-                    { text: "Nintendo Entertainment System", points: 14 },
-                    { text: "Sega Genesis", points: 7 },
-                    { text: "GameCube", points: 4 },
-                    { text: "Gameboy", points: 2 }
-                ]
-            },
-            {
-                question: "NAME A MINECRAFT ANIMAL OR MONSTER",
-                answers: [
-                    { text: "Creeper", points: 37 },
-                    { text: "Pig", points: 10 },
-                    { text: "Enderman", points: 9 },
-                    { text: "Sheep", points: 6 },
-                    { text: "Chicken", points: 5 },
-                    { text: "Zombie", points: 5 },
-                    { text: "Axolotl", points: 3 }
-                ]
-            },
-            {
-                question: "WHAT TOOL/SUPPLY IS A MUST HAVE IN A COSPLAY EMERGENCY REPAIR KIT?",
-                answers: [
-                    { text: "Safety Pins", points: 22 },
-                    { text: "Needle and Thread", points: 15 },
-                    { text: "Duct Tape", points: 10 },
-                    { text: "Fabric Tape", points: 10 },
-                    { text: "Hot Glue Gun", points: 8 },
-                    { text: "Super Glue", points: 8 }
-                ]
-            },
-            {
-                question: "NAME A DROID IN THE STAR WARS FRANCHISE",
-                answers: [
-                    { text: "R2-D2", points: 41 },
-                    { text: "C-3PO", points: 20 },
-                    { text: "BB-8", points: 10 },
-                    { text: "IG-88", points: 5 },
-                    { text: "K-2SO", points: 4 },
-                    { text: "Chopper (C1-10P)", points: 4 },
-                    { text: "Gonk", points: 2 }
-                ]
-            },
-            {
-                question: "WHAT IS THE BEST LIVE ACTION MOVIE BASED ON A VIDEO GAME?",
-                answers: [
-                    { text: "Sonic the Hedgehog", points: 18 },
-                    { text: "Mortal Kombat", points: 15 },
-                    { text: "Resident Evil", points: 12 },
-                    { text: "Pokémon Detective Pikachu", points: 10 },
-                    { text: "The Super Mario Bros. Movie", points: 9 },
-                    { text: "Tomb Raider", points: 7 }
-                ]
-            },
-            {
-                question: "NAME A DUNGEONS AND DRAGONS CLASS",
-                answers: [
-                    { text: "Bard", points: 22 },
-                    { text: "Rogue", points: 17 },
-                    { text: "Paladin", points: 11 },
-                    { text: "Druid", points: 9 },
-                    { text: "Cleric", points: 7 },
-                    { text: "Wizard", points: 6 },
-                    { text: "Warlock", points: 5 }
-                ]
-            },
-            {
-                question: "OTHER THAN MARIO, NAME AN ICONIC VIDEO GAME CHARACTER NON-GAMERS WOULD RECOGNIZE",
-                answers: [
-                    { text: "Sonic", points: 25 },
-                    { text: "Link", points: 17 },
-                    { text: "Pikachu", points: 14 },
-                    { text: "Pac-Man", points: 9 },
-                    { text: "Luigi", points: 5 },
-                    { text: "Donkey Kong", points: 4 }
-                ]
-            },
-            {
-                question: "NAME A VIDEO GAME THAT HAS A WEIRD/UNIQUE CURRENCY",
-                answers: [
-                    { text: "Fallout", points: 31 },
-                    { text: "Legend of Zelda", points: 11 },
-                    { text: "Animal Crossing", points: 11 },
-                    { text: "Sims", points: 11 },
-                    { text: "Final Fantasy", points: 10 }
-                ]
-            },
-            {
-                question: "NAME A POPULAR PARTY BOARD GAME",
-                answers: [
-                    { text: "Cards Against Humanity", points: 23 },
-                    { text: "Codenames", points: 17 },
-                    { text: "Werewolf", points: 11 },
-                    { text: "Wavelength", points: 7 },
-                    { text: "What Do You Meme", points: 6 },
-                    { text: "Hues and Cues", points: 5 }
-                ]
-            },
-            {
-                question: "NAME A CLASSIC ARCADE GAME",
-                answers: [
-                    { text: "Pac Man", points: 41 },
-                    { text: "Galaga", points: 12 },
-                    { text: "Street Fighter", points: 8 },
-                    { text: "Centipede", points: 6 },
-                    { text: "Donkey Kong", points: 5 },
-                    { text: "Asteroids", points: 4 }
-                ]
-            },
-            {
-                question: "NAME A POPULAR BOARD GAME",
-                answers: [
-                    { text: "Catan", points: 24 },
-                    { text: "Monopoly", points: 20 },
-                    { text: "Clue", points: 7 },
-                    { text: "Scrabble", points: 7 },
-                    { text: "Ticket to Ride", points: 5 },
-                    { text: "Wingspan", points: 4 },
-                    { text: "Betrayal at House on the Hill", points: 4 }
-                ]
-            },
-            {
-                question: "NAME A POPULAR JACKBOX GAME",
-                answers: [
-                    { text: "Quiplash", points: 32 },
-                    { text: "Trivia Murder Party", points: 18 },
-                    { text: "Tee K.O.", points: 13 },
-                    { text: "Drawful", points: 8 },
-                    { text: "Fibbage", points: 5 },
-                    { text: "You Don't Know Jack", points: 5 }
-                ]
-            },
-            {
-                question: "OTHER THAN FINAL FANTASY, NAME A POPULAR RPG VIDEO GAME SERIES",
-                answers: [
-                    { text: "Baldur's Gate", points: 16 },
-                    { text: "The Elder Scrolls", points: 15 },
-                    { text: "Fallout", points: 12 },
-                    { text: "Dragon Quest", points: 10 },
-                    { text: "Persona", points: 9 },
-                    { text: "Pokémon", points: 9 },
-                    { text: "Kingdom Hearts", points: 7 }
-                ]
-            },
-            {
-                question: "WHO IS THE BEST SUPER SMASH BROS. CHARACTER?",
-                answers: [
-                    { text: "Kirby", points: 33 },
-                    { text: "Link", points: 12 },
-                    { text: "Samus", points: 7 },
-                    { text: "Yoshi", points: 7 },
-                    { text: "Ness", points: 7 },
-                    { text: "Minecraft Steve", points: 6 },
-                    { text: "Pikachu", points: 5 }
-                ]
-            },
-            {
-                question: "IN POKÉMON, WHAT'S YOUR FAVORITE EEVEELUTION?",
-                answers: [
-                    { text: "Umbreon", points: 17 },
-                    { text: "Jolteon", points: 13 },
-                    { text: "Vaporeon", points: 12 },
-                    { text: "Sylveon", points: 12 },
-                    { text: "Flareon", points: 10 },
-                    { text: "Leafeon", points: 8 },
-                    { text: "Espeon", points: 8 }
-                ]
-            },
-            {
-                question: "WHAT'S THE BEST GAME IN THE ZELDA FRANCHISE?",
-                answers: [
-                    { text: "Ocarina of Time", points: 26 },
-                    { text: "Breath of the Wild", points: 19 },
-                    { text: "A Link to the Past", points: 15 },
-                    { text: "The Wind Waker", points: 6 },
-                    { text: "Twilight Princess", points: 6 },
-                    { text: "Majora's Mask", points: 5 }
-                ]
+        // Questions come from questions.js (edit that file to add or change questions)
+        let questionBank = [];
+        let questionProblems = [];
+        (function loadQuestionsFromFile() {
+            const raw = window.QUESTIONS;
+            if (!Array.isArray(raw)) {
+                questionProblems.push('questions.js did not load. Check that the file is in the repo next to control.html, and that it has no typos (a missing comma or quote mark).');
+                return;
             }
-        ];
+            raw.forEach((q, i) => {
+                const n = i + 1;
+                if (!q || typeof q.question !== 'string' || !q.question.trim()) {
+                    questionProblems.push('Question ' + n + ' has no question text, so it was skipped.');
+                    return;
+                }
+                if (!Array.isArray(q.answers) || q.answers.length === 0) {
+                    questionProblems.push('Question ' + n + ' has no answers, so it was skipped.');
+                    return;
+                }
+                const answers = [];
+                let bad = false;
+                q.answers.forEach((a, j) => {
+                    const text = Array.isArray(a) ? a[0] : null;
+                    const points = Array.isArray(a) ? Number(a[1]) : NaN;
+                    if (typeof text !== 'string' || !text.trim() || !isFinite(points)) {
+                        questionProblems.push('Question ' + n + ', answer ' + (j + 1) + ' should look like ["Text", 10], so the question was skipped.');
+                        bad = true;
+                    } else {
+                        answers.push({ text: text.trim(), points: points });
+                    }
+                });
+                if (bad) return;
+                if (answers.length > 8) {
+                    questionProblems.push('Question ' + n + ' has ' + answers.length + ' answers. Screens fit up to about 8 comfortably.');
+                }
+                questionBank.push({ n: n, question: q.question.trim(), answers: answers });
+            });
+        })();
         // Game state
         let gameState = {
             currentQuestionIndex: 0,
@@ -648,19 +391,10 @@
 
         // Save to Firebase (syncs to the display page and any other control device instantly)
         function saveToStorage() {
-            db.ref('questionBank').set(questionBank);
             db.ref('gameState').set(gameState);
         }
 
         // Listen for changes from Firebase, from any device, in real time
-        db.ref('questionBank').on('value', (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                questionBank = data;
-                renderQuestionButtons();
-            }
-        });
-
         db.ref('gameState').on('value', (snapshot) => {
             const data = snapshot.val();
             if (data) {
@@ -697,7 +431,8 @@
             questionBank.forEach((q, index) => {
                 const option = document.createElement('option');
                 option.value = index;
-                option.textContent = `Question ${index + 1}`;
+                const preview = q.question.length > 38 ? q.question.slice(0, 38).trim() + '...' : q.question;
+                option.textContent = `${q.n}. ${preview}`;
                 if (index === gameState.currentQuestionIndex) option.selected = true;
                 select.appendChild(option);
             });
@@ -828,61 +563,6 @@
             }
         }
 
-        // Question Editor Functions
-        function loadQuestionIntoEditor() {
-            const currentQ = questionBank[gameState.currentQuestionIndex];
-            document.getElementById('editQuestion').value = currentQ.question;
-
-            const answersText = currentQ.answers.map(a => `${a.text}, ${a.points}`).join('\n');
-            document.getElementById('editAnswers').value = answersText;
-        }
-
-        function updateCurrentQuestion() {
-            const questionText = document.getElementById('editQuestion').value.trim();
-            const answersText = document.getElementById('editAnswers').value.trim();
-
-            if (!questionText) {
-                alert('Please enter a question');
-                return;
-            }
-
-            if (!answersText) {
-                alert('Please enter at least one answer');
-                return;
-            }
-
-            // Parse answers
-            const answerLines = answersText.split('\n').filter(line => line.trim());
-            const answers = [];
-
-            for (let line of answerLines) {
-                const parts = line.split(',');
-                if (parts.length >= 2) {
-                    const text = parts[0].trim();
-                    const points = parseInt(parts[1].trim()) || 0;
-                    if (text) {
-                        answers.push({ text, points });
-                    }
-                }
-            }
-
-            if (answers.length === 0) {
-                alert('Please enter answers in format: "Answer, Points"');
-                return;
-            }
-
-            // Update question bank
-            questionBank[gameState.currentQuestionIndex] = {
-                question: questionText,
-                answers: answers
-            };
-
-            // Reload the question to display
-            loadQuestion(gameState.currentQuestionIndex);
-
-            alert('Question updated successfully!');
-        }
-
         // Display background - options come from backgrounds.js, choice is saved in Firebase
         const BACKGROUNDS = window.BACKGROUNDS || [{ id: 'black', label: 'Plain Black' }];
         const DEFAULT_BACKGROUND = window.DEFAULT_BACKGROUND || BACKGROUNDS[0].id;
@@ -903,6 +583,11 @@
 
         // Initialize (Firebase listeners above load everything automatically)
         renderQuestionButtons();
+        if (questionProblems.length) {
+            const w = document.getElementById('questionWarning');
+            w.innerHTML = 'Fix needed in questions.js:<br>' + questionProblems.map(p => '- ' + p).join('<br>');
+            w.style.display = 'block';
+        }
 
         // Keyboard shortcuts
         document.addEventListener('keydown', (e) => {
