@@ -9,6 +9,7 @@ File	What it is	Where it's used
 `streaming.html`	Game display, camera-space layout. Question and answers sit on the right, and the left side is left empty for a live camera feed.	Mall of America, where a production team overlays a camera feed in OBS.
 `questions.html`	Question editor. Add, change, reorder or delete questions with plain text boxes.	Used before the event by anyone helping.
 `backgrounds.js`	The list of choices in the control panel's Display Background dropdown.	Edited when you add a new con or look.
+`QuantumCon-Logo.svg`	The animated Quantum-Con logo shown large and faint behind the game. Must stay in the main folder.	Loaded by the display pages.
 `2dcon.mp4`, `Akeome.mp4`	The branded background loops for each con. They must stay in the main folder next to the HTML files, and the names must match `backgrounds.js` exactly (capital letters count).	Loaded by the display pages.
 The display pages only show the game. `control.html` is the only page that changes the game. Any mix of pages open on different devices stays in sync in real time.
 Running an event
