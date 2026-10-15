@@ -9,6 +9,7 @@
 //   video  (optional) file name of a looping mp4 in the repo
 //   logo   (optional) file name of an SVG or PNG shown large and faint in the middle of the screen
 //          (an animated SVG will keep moving). logoOpacity (optional) 0 to 1, default 0.2
+//   effect (optional) animation drawn over the screen, e.g. { type: 'slime', color: '#7dff2a' }. See effects.js
 //   image  (optional) file name or data link of a still picture shown behind the video
 //   theme  (optional) colors for the game boxes. Leave it out to keep the standard navy and purple look.
 //          Colors you can set (any you leave out stay standard):
@@ -80,6 +81,34 @@ window.BACKGROUNDS = [
       'panel-bg': '#202d61',
       'panel-text': '#ffffff',
       'strike-bg': '#202d61',
+      'text-shadow': 'none'
+    }
+  },
+  {
+    id: 'ghost',
+    label: 'Ghost Hunters - Slime',
+    color: '#0c110d',
+    effect: { type: 'slime', color: '#7dff2a' },
+    // logo: 'Ghost-Logo.png',   // add your own logo file here to show it large and faint in the middle
+    logoOpacity: 0.12,
+    theme: {
+      // Black, slime green and Ghostbusters-style red for revealed answers (green slime shows up on red)
+      'q-bg': '#050806',
+      'q-text': '#ffffff',
+      'q-border': '0.12em solid #7dff2a',
+      'card-bg': '#101712',
+      'card-border': '0.1em solid #3f8f1a',
+      'num-bg': 'rgba(125, 255, 42, 0.2)',
+      'num-text': '#b8ff8a',
+      'rev-bg': '#d6221f',
+      'rev-text': '#ffffff',
+      'rev-border': '0.1em solid #ffffff',
+      'rev-glow': 'rgba(214, 34, 31, 0.55)',
+      'rev-num-bg': '#050806',
+      'rev-num-text': '#ffffff',
+      'panel-bg': '#050806',
+      'panel-text': '#7dff2a',
+      'strike-bg': '#050806',
       'text-shadow': 'none'
     }
   },
