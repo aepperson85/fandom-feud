@@ -271,6 +271,7 @@
     </div>
 
     <script src="backgrounds.js"></script>
+    <script src="effects.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     <script>
@@ -316,6 +317,8 @@
                 logo.style.display = 'none';
                 logo.removeAttribute('src');
             }
+            // Optional animated effect (slime etc.) from effects.js
+            if (window.FFEffects) FFEffects.set(opt.effect, display);
             display.style.backgroundImage = opt.image ? 'url("' + opt.image + '")' : 'none';
             display.style.backgroundSize = 'cover';
             display.style.backgroundPosition = 'center';
