@@ -38,6 +38,20 @@
             background: #000;
         }
 
+        .bg-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            height: 94%;
+            width: 94%;
+            transform: translate(-50%, -50%);
+            object-fit: contain;
+            opacity: 0.2;
+            display: none;
+            pointer-events: none;
+            z-index: 0;
+        }
+
         .bg-video {
             position: absolute;
             top: 0;
@@ -220,6 +234,7 @@
 <body>
     <div class="game-display" id="gameDisplay" data-bg="pending">
         <video class="bg-video" id="bgVideo" autoplay muted loop playsinline></video>
+        <img class="bg-logo" id="bgLogo" alt="">
         <div class="game-top-row">
             <div class="game-content-panel">
                 <div class="question" id="questionDisplay">NAME SOMETHING PEOPLE DO AT A GAMING CONVENTION</div>
@@ -291,6 +306,16 @@
                 display.style.setProperty('--' + key, opt.theme[key]);
                 appliedThemeVars.push('--' + key);
             });
+            // Optional animated logo shown large and faint behind the game
+            const logo = document.getElementById('bgLogo');
+            if (opt.logo) {
+                if (logo.getAttribute('src') !== opt.logo) logo.setAttribute('src', opt.logo);
+                logo.style.opacity = opt.logoOpacity != null ? opt.logoOpacity : 0.2;
+                logo.style.display = 'block';
+            } else {
+                logo.style.display = 'none';
+                logo.removeAttribute('src');
+            }
             display.style.backgroundImage = opt.image ? 'url("' + opt.image + '")' : 'none';
             display.style.backgroundSize = 'cover';
             display.style.backgroundPosition = 'center';
