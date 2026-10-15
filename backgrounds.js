@@ -85,8 +85,8 @@ window.BACKGROUNDS = [
     }
   },
   {
-    id: 'ghost',
-    label: 'Ghost Hunters - Slime',
+    id: 'slimegreen',
+    label: 'Slime Green',
     color: '#0c110d',
     effect: { type: 'slime', color: '#7dff2a' },
     // logo: 'Ghost-Logo.png',   // add your own logo file here to show it large and faint in the middle
@@ -109,6 +109,34 @@ window.BACKGROUNDS = [
       'panel-bg': '#050806',
       'panel-text': '#7dff2a',
       'strike-bg': '#050806',
+      'text-shadow': 'none'
+    }
+  },
+  {
+    id: 'slimepink',
+    label: 'Slime Pink',
+    color: '#120a10',
+    effect: { type: 'slime', color: '#ff5fb8' },
+    // logo: 'Ghost-Logo.png',   // add your own logo file here to show it large and faint in the middle
+    logoOpacity: 0.12,
+    theme: {
+      // Black, slime pink and purple for revealed answers (pink slime shows up on purple)
+      'q-bg': '#0a0508',
+      'q-text': '#ffffff',
+      'q-border': '0.12em solid #ff5fb8',
+      'card-bg': '#1a0f16',
+      'card-border': '0.1em solid #a8387a',
+      'num-bg': 'rgba(255, 95, 184, 0.2)',
+      'num-text': '#ffc2e4',
+      'rev-bg': '#7a1fa2',
+      'rev-text': '#ffffff',
+      'rev-border': '0.1em solid #ffffff',
+      'rev-glow': 'rgba(122, 31, 162, 0.6)',
+      'rev-num-bg': '#0a0508',
+      'rev-num-text': '#ffffff',
+      'panel-bg': '#0a0508',
+      'panel-text': '#ff5fb8',
+      'strike-bg': '#0a0508',
       'text-shadow': 'none'
     }
   },
